@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,54 +14,51 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    private final static String THEMOVIEDB_BASE_URL = "https://api.themoviedb.org/3/movie/";
-    private final static String THEMOVIEDB_PARAM_KEY = "api_key";
-    private final static String THEMOVIEDB_MOST_POPULAR_PATH = "popular";
-    private final static String THEMOVIEDB_TOP_RATED_PATH = "top_rated";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ((TextView) findViewById(R.id.text_message)).setText(BuildConfig.THEMOVIEDB_API_KEY);
-        updateMovies(THEMOVIEDB_MOST_POPULAR_PATH);
+        updateMovies(getString(R.string.themoviedb_most_popular_path));
     }
 
-    private void updateMovies(String sortPath) {
+    private URL buildMoviesURL(String selectionPath) {
         URL url = null;
-        Uri uri = Uri.parse(THEMOVIEDB_BASE_URL).buildUpon()
-                .appendPath(sortPath)
-                .appendQueryParameter(THEMOVIEDB_PARAM_KEY, BuildConfig.THEMOVIEDB_API_KEY)
+        Uri uri = Uri.parse(getString(R.string.themoviedb_base_url)).buildUpon()
+                .appendPath(selectionPath)
+                .appendQueryParameter(
+                        getString(R.string.themoviedb_param_key), BuildConfig.THEMOVIEDB_API_KEY)
                 .build();
         try {
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
+        return url;
+    }
+
+    private void updateMovies(String selectionPath) {
+        URL url = buildMoviesURL(selectionPath);
         if (url != null) {
-            new MoviesQueryTask().execute(url);
+            new DownloadMoviesTask().execute(url);
         }
     }
 
-    private class MoviesQueryTask extends AsyncTask<URL, Void, String> {
+    private class DownloadMoviesTask extends AsyncTask<URL, Void, String> {
 
-        public String getResponseFromHttpUrl(URL url) throws IOException {
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        private String getResponseFromUrl(URL url) throws IOException {
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            String response = null;
             try {
-                InputStream in = urlConnection.getInputStream();
-
-                Scanner scanner = new Scanner(in);
-                scanner.useDelimiter("\\A");
-
-                boolean hasInput = scanner.hasNext();
-                if (hasInput) {
-                    return scanner.next();
-                } else {
-                    return null;
+                Scanner scanner = new Scanner(connection.getInputStream());
+                scanner.useDelimiter(getString(R.string.scanner_delimiter));
+                if (scanner.hasNext()) {
+                    response = scanner.next();
                 }
             } finally {
-                urlConnection.disconnect();
+                connection.disconnect();
             }
+            return response;
         }
 
         @Override
@@ -70,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
             URL url = urls[0];
             String results = null;
             try {
-                results = getResponseFromHttpUrl(url);
+                results = getResponseFromUrl(url);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -81,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(String s) {
             if ((s != null) && (!s.equals(""))) {
                 ((TextView) findViewById(R.id.text_message)).setText(s);
-
             }
         }
     }
