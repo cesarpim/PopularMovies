@@ -16,6 +16,9 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        buildTypes.each {
+            it.buildConfigField 'String', 'THEMOVIEDB_API_KEY', TheMovieDBApiKey
+        }
     }
     // removes the lint error: `Not all execution paths return a value`.
     return void
