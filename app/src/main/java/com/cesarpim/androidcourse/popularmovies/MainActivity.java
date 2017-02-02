@@ -100,10 +100,10 @@ public class MainActivity extends AppCompatActivity {
             JSONArray jsonArray = jsonObject.getJSONArray(
                     getString(R.string.themoviedb_json_results_tag));
             int numMovies = jsonArray.length();
-            Movie[] movies = new Movie[numMovies];
+            Movie[] moviesRead = new Movie[numMovies];
             for (int i = 0; i < numMovies; i++) {
                 JSONObject jsonMovie = jsonArray.getJSONObject(i);
-                movies[i] = new Movie(
+                moviesRead[i] = new Movie(
                         jsonMovie.getInt(getString(R.string.themoviedb_json_id_tag)),
                         jsonMovie.getString(getString(R.string.themoviedb_json_original_title_tag)),
                         jsonMovie.getString(getString(R.string.themoviedb_json_poster_path_tag)),
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                         jsonMovie.getDouble(getString(R.string.themoviedb_json_rating_tag)),
                         jsonMovie.getString(getString(R.string.themoviedb_json_release_date_tag)));
             }
-            return movies;
+            return moviesRead;
         }
 
     }
