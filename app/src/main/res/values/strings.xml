@@ -9,7 +9,12 @@
     <string name="scanner_delimiter">\\A</string>
 
     <string name="themoviedb_json_results_tag">results</string>
-    <string name="themoviedb_json_title_tag">title</string>
+    <string name="themoviedb_json_id_tag">id</string>
+    <string name="themoviedb_json_original_title_tag">original_title</string>
+    <string name="themoviedb_json_poster_path_tag">poster_path</string>
+    <string name="themoviedb_json_synopsis_tag">overview</string>
+    <string name="themoviedb_json_rating_tag">vote_average</string>
+    <string name="themoviedb_json_release_date_tag">release_date</string>
 
     <string name="poster_content_description">Poster</string>
 
