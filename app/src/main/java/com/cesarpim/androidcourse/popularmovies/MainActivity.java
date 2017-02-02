@@ -6,6 +6,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private class DownloadMoviesTask extends AsyncTask<URL, Void, String> {
 
-        private String getResponseFromUrl(URL url) throws IOException {
+        private String getResponseFromURL(URL url) throws IOException {
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             String response = null;
             try {
@@ -66,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
             URL url = urls[0];
             String results = null;
             try {
-                results = getResponseFromUrl(url);
+                results = getResponseFromURL(url);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -76,7 +80,32 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             if ((s != null) && (!s.equals(""))) {
-                ((TextView) findViewById(R.id.text_message)).setText(s);
+
+                String[] titles = null;
+                JSONObject responseJSON = null;
+                try {
+                    responseJSON = new JSONObject(s);
+                    // TODO: Check for error codes from the API
+                    JSONArray resultsJSON = responseJSON.getJSONArray(
+                            getString(R.string.themoviedb_json_results_tag));
+                    int numMovies = resultsJSON.length();
+                    titles = new String[numMovies];
+                    for (int i = 0; i < numMovies; i++) {
+                        JSONObject movie = resultsJSON.getJSONObject(i);
+                        titles[i] = movie.getString(getString(R.string.themoviedb_json_title_tag));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                String message = "";
+                if (titles != null) {
+                    for (String title : titles) {
+                        message += title + "\n\n";
+                    }
+                }
+
+                ((TextView) findViewById(R.id.text_message)).setText(message);
             }
         }
     }
