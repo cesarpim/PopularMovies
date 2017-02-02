@@ -22,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        ((TextView) findViewById(R.id.text_message)).setText(BuildConfig.THEMOVIEDB_API_KEY);
         updateMovies(getString(R.string.themoviedb_most_popular_path));
     }
 
