@@ -1,10 +1,20 @@
 package com.cesarpim.androidcourse.popularmovies;
 
+import android.app.Application;
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,12 +28,24 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Movie[] movies = null;
+    private Movie[] movies = new Movie[0];
+    private RecyclerView moviesRecyclerView;
+    private PostersAdapter postersAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        moviesRecyclerView = (RecyclerView) findViewById(R.id.recycler_movies);
+        GridLayoutManager layoutManager =
+                new GridLayoutManager(this, getResources().getInteger(R.integer.poster_grid_span));
+        moviesRecyclerView.setLayoutManager(layoutManager);
+        moviesRecyclerView.setHasFixedSize(true);
+        postersAdapter = new PostersAdapter(movies, this);
+        moviesRecyclerView.setAdapter(postersAdapter);
+
         updateMoviesFromInternet(getString(R.string.themoviedb_most_popular_path));
     }
 
@@ -89,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 for (Movie m : movies) {
                     Log.i(MainActivity.class.getName(), m.toString() + "\n");
                 }
+                postersAdapter.updateMovies(movies);
             } else {
                 Log.w(MainActivity.class.getName(), "Response from server is null or empty!");
             }
@@ -116,18 +139,51 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-//    private static class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterViewHolder> {
-//
-//
-//        static class PosterViewHolder extends RecyclerView.ViewHolder {
-//
-//            ImageView poster;
-//
-//            public PosterViewHolder(View itemView) {
-//                super(itemView);
-//                poster = (ImageView) itemView.findViewById(R.id.image_poster);
-//            }
-//        }
-//    }
+    private static class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterViewHolder> {
+
+        Movie[] movies;
+        Context context;
+
+        public PostersAdapter(Movie[] movies, Context context) {
+            this.movies = movies;
+            this.context = context;
+        }
+
+        @Override
+        public PosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.movie_list_item, parent, false);
+            return new PosterViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(PosterViewHolder holder, int position) {
+            String posterStringURL =
+                    context.getString(R.string.themoviedb_image_base_url)
+                    + context.getString(R.string.themoviedb_image_size)
+                    + movies[position].getPosterPath();
+            Picasso.with(context).load(posterStringURL).into(holder.poster);
+        }
+
+        @Override
+        public int getItemCount() {
+            return movies.length;
+        }
+
+        public void updateMovies(Movie[] movies) {
+            this.movies = movies;
+            notifyDataSetChanged();
+        }
+
+        static class PosterViewHolder extends RecyclerView.ViewHolder {
+
+            ImageView poster;
+
+            public PosterViewHolder(View itemView) {
+                super(itemView);
+                poster = (ImageView) itemView.findViewById(R.id.image_poster);
+            }
+        }
+    }
 
 }
