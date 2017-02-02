@@ -11,4 +11,6 @@
     <string name="themoviedb_json_results_tag">results</string>
     <string name="themoviedb_json_title_tag">title</string>
 
+    <string name="poster_content_description">Poster</string>
+
 </resources>
