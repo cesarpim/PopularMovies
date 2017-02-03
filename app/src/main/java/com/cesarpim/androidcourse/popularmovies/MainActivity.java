@@ -1,6 +1,7 @@
 package com.cesarpim.androidcourse.popularmovies;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
@@ -39,6 +40,11 @@ public class MainActivity
     @Override
     public void onPosterClick(int clickedPosterIndex) {
         Log.d(MainActivity.class.getName(), movies[clickedPosterIndex].toString());
+        Intent launchDetailsIntent = new Intent(MainActivity.this, DetailsActivity.class);
+        launchDetailsIntent.putExtra(
+                getString(R.string.intent_extra_movie_key),
+                movies[clickedPosterIndex]);
+        startActivity(launchDetailsIntent);
     }
 
     @Override
