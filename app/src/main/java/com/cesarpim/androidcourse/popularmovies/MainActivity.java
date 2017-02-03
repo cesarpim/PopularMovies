@@ -30,7 +30,7 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    private enum SortBy {MOST_POPULAR, TOP_RATED}
+    private enum SortBy {MOST_POPULAR, HIGHEST_RATED}
 
     private Movie[] movies;
     private RecyclerView moviesRecyclerView;
@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
             if (sortBy == SortBy.MOST_POPULAR) {
                 menu.findItem(R.id.action_most_popular).setChecked(false);
             } else {
-                menu.findItem(R.id.action_top_rated).setChecked(false);
+                menu.findItem(R.id.action_highest_rated).setChecked(false);
             }
         }
         return true;
@@ -84,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
             case R.id.action_most_popular:
                 sortBy = SortBy.MOST_POPULAR;
                 break;
-            case R.id.action_top_rated:
-                sortBy = SortBy.TOP_RATED;
+            case R.id.action_highest_rated:
+                sortBy = SortBy.HIGHEST_RATED;
                 break;
             default:
                 return super.onOptionsItemSelected(item);
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         if (sortBy == SortBy.MOST_POPULAR) {
             url = buildMoviesURL(getString(R.string.themoviedb_most_popular_path));
         } else {
-            url = buildMoviesURL(getString(R.string.themoviedb_top_rated_path));
+            url = buildMoviesURL(getString(R.string.themoviedb_highest_rated_path));
         }
         if (url != null) {
             new DownloadMoviesTask().execute(url);

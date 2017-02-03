@@ -8,8 +8,8 @@
             <group android:checkableBehavior="single">
                 <item android:id="@+id/action_most_popular"
                     android:title="@string/title_action_most_popular" />
-                <item android:id="@+id/action_top_rated"
-                    android:title="@string/title_action_top_rated" />
+                <item android:id="@+id/action_highest_rated"
+                    android:title="@string/title_action_highest_rated" />
             </group>
         </menu>
     </item>
