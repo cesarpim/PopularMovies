@@ -159,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             if ((s != null) && (!s.equals(""))) {
                 try {
                     movies = getMoviesFromJSONString(s);
-                } catch (JSONException e) {
+                } catch (JSONException|ParseException e) {
                     e.printStackTrace();
                 }
 //                for (Movie m : movies) {
@@ -171,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        private Movie[] getMoviesFromJSONString (String s) throws JSONException {
+        private Movie[] getMoviesFromJSONString (String s) throws JSONException, ParseException {
             DateFormat themoviedbDateFormat =
                     new SimpleDateFormat(getString(R.string.themoviedb_json_release_date_format));
             JSONObject jsonObject = new JSONObject(s);
@@ -182,21 +182,14 @@ public class MainActivity extends AppCompatActivity {
             Movie[] moviesRead = new Movie[numMovies];
             for (int i = 0; i < numMovies; i++) {
                 JSONObject jsonMovie = jsonArray.getJSONObject(i);
-                try {
-                    moviesRead[i] = new Movie(
-                            jsonMovie.getInt(getString(R.string.themoviedb_json_id_tag)),
-                            jsonMovie.getString(
-                                    getString(R.string.themoviedb_json_original_title_tag)),
-                            jsonMovie.getString(
-                                    getString(R.string.themoviedb_json_poster_path_tag)),
-                            jsonMovie.getString(getString(R.string.themoviedb_json_synopsis_tag)),
-                            jsonMovie.getDouble(getString(R.string.themoviedb_json_rating_tag)),
-                            themoviedbDateFormat.parse(
-                                    jsonMovie.getString(
-                                            getString(R.string.themoviedb_json_release_date_tag))));
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                moviesRead[i] = new Movie(
+                        jsonMovie.getInt(getString(R.string.themoviedb_json_id_tag)),
+                        jsonMovie.getString(getString(R.string.themoviedb_json_original_title_tag)),
+                        jsonMovie.getString(getString(R.string.themoviedb_json_poster_path_tag)),
+                        jsonMovie.getString(getString(R.string.themoviedb_json_synopsis_tag)),
+                        jsonMovie.getDouble(getString(R.string.themoviedb_json_rating_tag)),
+                        themoviedbDateFormat.parse(jsonMovie.getString(
+                                getString(R.string.themoviedb_json_release_date_tag))));
             }
             return moviesRead;
         }
