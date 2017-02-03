@@ -1,5 +1,7 @@
 package com.cesarpim.androidcourse.popularmovies;
 
+import java.util.Date;
+
 /**
  * Created by CesarPim on 02-02-2017.
  *
@@ -15,14 +17,14 @@ public class Movie {
     private String posterPath;
     private String synopsis;
     private double rating;
-    private String releaseDate;
+    private Date releaseDate;
 
     public Movie(int id,
                  String originalTitle,
                  String posterPath,
                  String synopsis,
                  double rating,
-                 String releaseDate) {
+                 Date releaseDate) {
         this.id = id;
         this.originalTitle = originalTitle;
         this.posterPath = posterPath;
@@ -51,7 +53,7 @@ public class Movie {
         return rating;
     }
 
-    public String getReleaseDate() {
+    public Date getReleaseDate() {
         return releaseDate;
     }
 

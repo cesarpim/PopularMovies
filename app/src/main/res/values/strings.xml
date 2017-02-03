@@ -15,6 +15,7 @@
     <string name="themoviedb_json_synopsis_tag">overview</string>
     <string name="themoviedb_json_rating_tag">vote_average</string>
     <string name="themoviedb_json_release_date_tag">release_date</string>
+    <string name="themoviedb_json_release_date_format">yyyy-MM-dd</string>
 
     <string name="themoviedb_image_base_url">http://image.tmdb.org/t/p/</string>
     <string name="themoviedb_image_size">w185</string>

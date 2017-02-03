@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
@@ -169,6 +172,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private Movie[] getMoviesFromJSONString (String s) throws JSONException {
+            DateFormat themoviedbDateFormat =
+                    new SimpleDateFormat(getString(R.string.themoviedb_json_release_date_format));
             JSONObject jsonObject = new JSONObject(s);
             // TODO: Check for error codes from the API
             JSONArray jsonArray = jsonObject.getJSONArray(
@@ -177,13 +182,21 @@ public class MainActivity extends AppCompatActivity {
             Movie[] moviesRead = new Movie[numMovies];
             for (int i = 0; i < numMovies; i++) {
                 JSONObject jsonMovie = jsonArray.getJSONObject(i);
-                moviesRead[i] = new Movie(
-                        jsonMovie.getInt(getString(R.string.themoviedb_json_id_tag)),
-                        jsonMovie.getString(getString(R.string.themoviedb_json_original_title_tag)),
-                        jsonMovie.getString(getString(R.string.themoviedb_json_poster_path_tag)),
-                        jsonMovie.getString(getString(R.string.themoviedb_json_synopsis_tag)),
-                        jsonMovie.getDouble(getString(R.string.themoviedb_json_rating_tag)),
-                        jsonMovie.getString(getString(R.string.themoviedb_json_release_date_tag)));
+                try {
+                    moviesRead[i] = new Movie(
+                            jsonMovie.getInt(getString(R.string.themoviedb_json_id_tag)),
+                            jsonMovie.getString(
+                                    getString(R.string.themoviedb_json_original_title_tag)),
+                            jsonMovie.getString(
+                                    getString(R.string.themoviedb_json_poster_path_tag)),
+                            jsonMovie.getString(getString(R.string.themoviedb_json_synopsis_tag)),
+                            jsonMovie.getDouble(getString(R.string.themoviedb_json_rating_tag)),
+                            themoviedbDateFormat.parse(
+                                    jsonMovie.getString(
+                                            getString(R.string.themoviedb_json_release_date_tag))));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
             }
             return moviesRead;
         }
