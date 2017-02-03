@@ -21,4 +21,8 @@
     
     <string name="poster_content_description">Poster</string>
 
+    <string name="title_action_sort_by">Sort By…</string>
+    <string name="title_action_most_popular">Most Popular</string>
+    <string name="title_action_top_rated">Top Rated</string>
+
 </resources>
