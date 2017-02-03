@@ -9,14 +9,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +25,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity
+        extends AppCompatActivity
+        implements PostersAdapter.PosterClickListener {
 
     private enum SortBy {MOST_POPULAR, HIGHEST_RATED}
 
@@ -39,6 +35,11 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView moviesRecyclerView;
     private PostersAdapter postersAdapter;
     private SortBy sortBy = null;
+
+    @Override
+    public void onPosterClick(int clickedPosterIndex) {
+        Log.d(MainActivity.class.getName(), movies[clickedPosterIndex].toString());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         GridLayoutManager layoutManager = new GridLayoutManager(this, calculatePosterGridSpan());
         moviesRecyclerView.setLayoutManager(layoutManager);
         moviesRecyclerView.setHasFixedSize(true);
-        postersAdapter = new PostersAdapter(movies, this);
+        postersAdapter = new PostersAdapter(movies, this, this);
         moviesRecyclerView.setAdapter(postersAdapter);
 
         if (sortBy == null) {
@@ -163,11 +164,11 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 //                for (Movie m : movies) {
-//                    Log.i(MainActivity.class.getName(), m.toString() + "\n");
+//                    Log.d(MainActivity.class.getName(), m.toString() + "\n");
 //                }
                 postersAdapter.updateMovies(movies);
             } else {
-                Log.w(MainActivity.class.getName(), "Response from server is null or empty!");
+                Log.d(MainActivity.class.getName(), "Response from server is null or empty!");
             }
         }
 
@@ -194,53 +195,6 @@ public class MainActivity extends AppCompatActivity {
             return moviesRead;
         }
 
-    }
-
-    private static class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterViewHolder> {
-
-        Movie[] movies;
-        Context context;
-
-        public PostersAdapter(Movie[] movies, Context context) {
-            this.movies = movies;
-            this.context = context;
-        }
-
-        @Override
-        public PosterViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            View view = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.movie_list_item, parent, false);
-            return new PosterViewHolder(view);
-        }
-
-        @Override
-        public void onBindViewHolder(PosterViewHolder holder, int position) {
-            String posterStringURL =
-                    context.getString(R.string.themoviedb_image_base_url)
-                    + context.getString(R.string.themoviedb_image_size)
-                    + movies[position].getPosterPath();
-            Picasso.with(context).load(posterStringURL).into(holder.poster);
-        }
-
-        @Override
-        public int getItemCount() {
-            return movies.length;
-        }
-
-        public void updateMovies(Movie[] movies) {
-            this.movies = movies;
-            notifyDataSetChanged();
-        }
-
-        static class PosterViewHolder extends RecyclerView.ViewHolder {
-
-            ImageView poster;
-
-            public PosterViewHolder(View itemView) {
-                super(itemView);
-                poster = (ImageView) itemView.findViewById(R.id.image_poster);
-            }
-        }
     }
 
 }

@@ -1,5 +1,6 @@
 package com.cesarpim.androidcourse.popularmovies;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -10,7 +11,7 @@ import java.util.Date;
  * @author CesarPim
  */
 
-public class Movie {
+public class Movie implements Serializable {
 
     private int id;
     private String originalTitle;
