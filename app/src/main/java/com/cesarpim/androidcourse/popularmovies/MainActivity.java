@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +29,7 @@ import java.util.Scanner;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Movie[] movies = new Movie[0];
+    private Movie[] movies;
     private RecyclerView moviesRecyclerView;
     private PostersAdapter postersAdapter;
 
@@ -38,15 +39,24 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        movies  = new Movie[0];
         moviesRecyclerView = (RecyclerView) findViewById(R.id.recycler_movies);
-        GridLayoutManager layoutManager =
-                new GridLayoutManager(this, getResources().getInteger(R.integer.poster_grid_span));
+        GridLayoutManager layoutManager = new GridLayoutManager(this, calculatePosterGridSpan());
         moviesRecyclerView.setLayoutManager(layoutManager);
         moviesRecyclerView.setHasFixedSize(true);
         postersAdapter = new PostersAdapter(movies, this);
         moviesRecyclerView.setAdapter(postersAdapter);
 
         updateMoviesFromInternet(getString(R.string.themoviedb_most_popular_path));
+    }
+
+    private int calculatePosterGridSpan() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        double availableWidthPixels = metrics.widthPixels;
+        // Although dimension is written in dp, getDimension returns it in pixels
+        double posterMaxWidthPixels = getResources().getDimension(R.dimen.poster_maximum_width);
+        return (int) Math.ceil(availableWidthPixels / posterMaxWidthPixels);
     }
 
     private URL buildMoviesURL(String selectionPath) {
@@ -108,9 +118,9 @@ public class MainActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                for (Movie m : movies) {
-                    Log.i(MainActivity.class.getName(), m.toString() + "\n");
-                }
+//                for (Movie m : movies) {
+//                    Log.i(MainActivity.class.getName(), m.toString() + "\n");
+//                }
                 postersAdapter.updateMovies(movies);
             } else {
                 Log.w(MainActivity.class.getName(), "Response from server is null or empty!");
