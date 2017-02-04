@@ -39,7 +39,6 @@ public class MainActivity
 
     @Override
     public void onPosterClick(int clickedPosterIndex) {
-        Log.d(MainActivity.class.getName(), movies[clickedPosterIndex].toString());
         Intent launchDetailsIntent = new Intent(MainActivity.this, DetailsActivity.class);
         launchDetailsIntent.putExtra(
                 getString(R.string.intent_extra_movie_key),
@@ -174,7 +173,7 @@ public class MainActivity
 //                }
                 postersAdapter.updateMovies(movies);
             } else {
-                Log.d(MainActivity.class.getName(), "Response from server is null or empty!");
+                Log.w(MainActivity.class.getName(), "Response from server is null or empty!");
             }
         }
 

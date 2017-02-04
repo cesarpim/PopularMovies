@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="details_activity_title">Movie Details</string>
 
     <string name="themoviedb_base_url">https://api.themoviedb.org/3/movie/</string>
     <string name="themoviedb_param_key">api_key</string>
@@ -27,5 +28,8 @@
     <string name="title_action_highest_rated">Highest Rated</string>
 
     <string name="intent_extra_movie_key">movie</string>
+
+    <string name="details_release_date_format">MMM dd yyyy</string>
+    <string name="details_rating_cap">/10</string>
 
 </resources>

@@ -4,4 +4,10 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="poster_maximum_width">185dp</dimen>
 
+    <dimen name="details_element_distance">16dp</dimen>
+    <dimen name="huge_text_size">30sp</dimen>
+    <dimen name="big_text_size">22sp</dimen>
+    <dimen name="medium_text_size">20sp</dimen>
+    <dimen name="small_text_size">16sp</dimen>
+
 </resources>
