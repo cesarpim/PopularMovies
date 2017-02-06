@@ -179,9 +179,6 @@ public class MainActivity
                     movies = null;
                     e.printStackTrace();
                 }
-//                for (Movie m : movies) {
-//                    Log.d(MainActivity.class.getName(), m.toString() + "\n");
-//                }
                 makePostersVisible();
                 postersAdapter.updateMovies(movies);
             } else {
@@ -211,7 +208,6 @@ public class MainActivity
             // TODO: Check for error codes from the API
             JSONArray jsonArray = jsonObject.getJSONArray(
                     getString(R.string.themoviedb_json_results_tag));
-//            Log.d(MainActivity.class.getName(), jsonObject.toString());
             int numMovies = jsonArray.length();
             Movie[] moviesRead = new Movie[numMovies];
             for (int i = 0; i < numMovies; i++) {
