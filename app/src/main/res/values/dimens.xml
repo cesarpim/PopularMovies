@@ -2,9 +2,13 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+
     <dimen name="poster_maximum_width">185dp</dimen>
 
+    <dimen name="progress_bar_size">42dp</dimen>
+
     <dimen name="details_element_distance">16dp</dimen>
+
     <dimen name="huge_text_size">30sp</dimen>
     <dimen name="big_text_size">22sp</dimen>
     <dimen name="medium_text_size">20sp</dimen>

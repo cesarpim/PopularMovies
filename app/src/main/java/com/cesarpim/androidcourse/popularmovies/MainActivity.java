@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -36,6 +37,7 @@ public class MainActivity
     private Movie[] movies;
     private RecyclerView moviesRecyclerView;
     private TextView errorTextView;
+    private ProgressBar loadingProgressBar;
     private PostersAdapter postersAdapter;
     private SortBy sortBy = null;
 
@@ -62,6 +64,7 @@ public class MainActivity
         moviesRecyclerView.setAdapter(postersAdapter);
 
         errorTextView = (TextView) findViewById(R.id.text_error_main);
+        loadingProgressBar = (ProgressBar) findViewById(R.id.progress_loading);
 
         if (sortBy == null) {
             sortBy = SortBy.MOST_POPULAR;
@@ -148,6 +151,12 @@ public class MainActivity
     private class DownloadMoviesTask extends AsyncTask<URL, Void, String> {
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            loadingProgressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected String doInBackground(URL... urls) {
             URL url = urls[0];
             String results = null;
@@ -157,6 +166,25 @@ public class MainActivity
                 e.printStackTrace();
             }
             return results;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            loadingProgressBar.setVisibility(View.INVISIBLE);
+            if ((s != null) && (!s.equals(""))) {
+                try {
+                    movies = getMoviesFromJSONString(s);
+                } catch (JSONException|ParseException e) {
+                    e.printStackTrace();
+                }
+//                for (Movie m : movies) {
+//                    Log.d(MainActivity.class.getName(), m.toString() + "\n");
+//                }
+                showPosters();
+                postersAdapter.updateMovies(movies);
+            } else {
+                showError();
+            }
         }
 
         private String getResponseFromURL(URL url) throws IOException {
@@ -172,24 +200,6 @@ public class MainActivity
                 connection.disconnect();
             }
             return response;
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            if ((s != null) && (!s.equals(""))) {
-                try {
-                    movies = getMoviesFromJSONString(s);
-                } catch (JSONException|ParseException e) {
-                    e.printStackTrace();
-                }
-//                for (Movie m : movies) {
-//                    Log.d(MainActivity.class.getName(), m.toString() + "\n");
-//                }
-                showPosters();
-                postersAdapter.updateMovies(movies);
-            } else {
-                showError();
-            }
         }
 
         private Movie[] getMoviesFromJSONString (String s) throws JSONException, ParseException {

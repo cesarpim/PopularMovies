@@ -24,5 +24,13 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         />
+    
+    <ProgressBar
+        android:id="@+id/progress_loading"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        android:layout_width="@dimen/progress_bar_size"
+        android:layout_height="@dimen/progress_bar_size"
+        />
 
 </FrameLayout>
