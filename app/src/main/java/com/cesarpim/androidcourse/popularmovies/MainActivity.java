@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -111,12 +110,12 @@ public class MainActivity
         return true;
     }
 
-    private void showPosters() {
+    private void makePostersVisible() {
         errorTextView.setVisibility(View.INVISIBLE);
         moviesRecyclerView.setVisibility(View.VISIBLE);
     }
 
-    private void showError() {
+    private void makeErrorVisible() {
         moviesRecyclerView.setVisibility(View.INVISIBLE);
         errorTextView.setVisibility(View.VISIBLE);
     }
@@ -183,10 +182,10 @@ public class MainActivity
 //                for (Movie m : movies) {
 //                    Log.d(MainActivity.class.getName(), m.toString() + "\n");
 //                }
-                showPosters();
+                makePostersVisible();
                 postersAdapter.updateMovies(movies);
             } else {
-                showError();
+                makeErrorVisible();
             }
         }
 
