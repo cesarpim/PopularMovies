@@ -122,7 +122,7 @@ public class MainActivity
     }
 
     private URL buildMoviesURL(String selectionPath) {
-        URL url = null;
+        URL url;
         Uri uri = Uri.parse(getString(R.string.themoviedb_base_url)).buildUpon()
                 .appendPath(selectionPath)
                 .appendQueryParameter(
@@ -131,6 +131,7 @@ public class MainActivity
         try {
             url = new URL(uri.toString());
         } catch (MalformedURLException e) {
+            url = null;
             e.printStackTrace();
         }
         return url;
@@ -159,10 +160,11 @@ public class MainActivity
         @Override
         protected String doInBackground(URL... urls) {
             URL url = urls[0];
-            String results = null;
+            String results;
             try {
                 results = getResponseFromURL(url);
             } catch (IOException e) {
+                results = null;
                 e.printStackTrace();
             }
             return results;
@@ -175,6 +177,7 @@ public class MainActivity
                 try {
                     movies = getMoviesFromJSONString(s);
                 } catch (JSONException|ParseException e) {
+                    movies = null;
                     e.printStackTrace();
                 }
 //                for (Movie m : movies) {
