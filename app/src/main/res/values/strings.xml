@@ -7,6 +7,9 @@
     <string name="themoviedb_most_popular_path">popular</string>
     <string name="themoviedb_highest_rated_path">top_rated</string>
 
+    <string name="connection_error_message">
+        Can\'t connect to server. Please check your connection or try again later.</string>
+
     <string name="scanner_delimiter">\\A</string>
 
     <string name="themoviedb_json_results_tag">results</string>

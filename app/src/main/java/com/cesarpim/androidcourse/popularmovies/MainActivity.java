@@ -1,6 +1,5 @@
 package com.cesarpim.androidcourse.popularmovies;
 
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -12,6 +11,8 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +35,7 @@ public class MainActivity
 
     private Movie[] movies;
     private RecyclerView moviesRecyclerView;
+    private TextView errorTextView;
     private PostersAdapter postersAdapter;
     private SortBy sortBy = null;
 
@@ -58,6 +60,8 @@ public class MainActivity
         moviesRecyclerView.setHasFixedSize(true);
         postersAdapter = new PostersAdapter(movies, this, this);
         moviesRecyclerView.setAdapter(postersAdapter);
+
+        errorTextView = (TextView) findViewById(R.id.text_error_main);
 
         if (sortBy == null) {
             sortBy = SortBy.MOST_POPULAR;
@@ -102,6 +106,16 @@ public class MainActivity
         item.setChecked(false);
         updateMoviesFromInternet();
         return true;
+    }
+
+    private void showPosters() {
+        errorTextView.setVisibility(View.INVISIBLE);
+        moviesRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showError() {
+        moviesRecyclerView.setVisibility(View.INVISIBLE);
+        errorTextView.setVisibility(View.VISIBLE);
     }
 
     private URL buildMoviesURL(String selectionPath) {
@@ -171,9 +185,10 @@ public class MainActivity
 //                for (Movie m : movies) {
 //                    Log.d(MainActivity.class.getName(), m.toString() + "\n");
 //                }
+                showPosters();
                 postersAdapter.updateMovies(movies);
             } else {
-                Log.w(MainActivity.class.getName(), "Response from server is null or empty!");
+                showError();
             }
         }
 
@@ -184,6 +199,7 @@ public class MainActivity
             // TODO: Check for error codes from the API
             JSONArray jsonArray = jsonObject.getJSONArray(
                     getString(R.string.themoviedb_json_results_tag));
+//            Log.d(MainActivity.class.getName(), jsonObject.toString());
             int numMovies = jsonArray.length();
             Movie[] moviesRead = new Movie[numMovies];
             for (int i = 0; i < numMovies; i++) {

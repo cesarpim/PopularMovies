@@ -34,11 +34,6 @@ public class DetailsActivity extends AppCompatActivity {
         if (launchIntent.hasExtra(getString(R.string.intent_extra_movie_key))) {
             movie = (Movie) launchIntent.getSerializableExtra(getString(R.string.intent_extra_movie_key));
         }
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
         if (movie != null) {
             setupViews();
         }
