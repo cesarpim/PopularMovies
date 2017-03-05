@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -205,7 +206,6 @@ public class MainActivity
             DateFormat themoviedbDateFormat =
                     new SimpleDateFormat(getString(R.string.themoviedb_json_release_date_format));
             JSONObject jsonObject = new JSONObject(s);
-            // TODO: Check for error codes from the API
             JSONArray jsonArray = jsonObject.getJSONArray(
                     getString(R.string.themoviedb_json_results_tag));
             int numMovies = jsonArray.length();
