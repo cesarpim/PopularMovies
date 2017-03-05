@@ -28,7 +28,8 @@ public class FavoriteMoviesDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         final String CREATE_TABLE_SQL_STATEMENT = "CREATE TABLE " +
                 MovieEntry.TABLE_NAME + " (" +
-                MovieEntry._ID + " INTEGER PRIMARY KEY, " +
+                MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                MovieEntry.COLUMN_API_MOVIE_ID + " INTEGER NOT NULL, " +
                 MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL);";
         sqLiteDatabase.execSQL(CREATE_TABLE_SQL_STATEMENT);

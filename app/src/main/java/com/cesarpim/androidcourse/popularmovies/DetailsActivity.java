@@ -72,9 +72,10 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     public void onClickAddFavorite(View view) {
+        // TODO: Should be in a background thread?
         if (movie != null) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(FavoriteMoviesContract.MovieEntry._ID, movie.getId());
+            contentValues.put(FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID, movie.getId());
             contentValues.put(
                     FavoriteMoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
                     movie.getOriginalTitle());
@@ -84,6 +85,7 @@ public class DetailsActivity extends AppCompatActivity {
             Uri uri = getContentResolver()
                     .insert(FavoriteMoviesContract.MovieEntry.CONTENT_URI, contentValues);
             Log.d("INSERT URI", uri.toString());
+            // TODO: Check if duplicate?
         }
     }
 

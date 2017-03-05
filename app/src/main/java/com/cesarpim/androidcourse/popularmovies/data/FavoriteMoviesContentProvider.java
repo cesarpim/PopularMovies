@@ -77,11 +77,41 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
     @Override
     public Cursor query(
             @NonNull Uri uri,
-            @Nullable String[] strings,
-            @Nullable String s,
-            @Nullable String[] strings1,
-            @Nullable String s1) {
-        return null;
+            @Nullable String[] projection,
+            @Nullable String selection,
+            @Nullable String[] selectionArgs,
+            @Nullable String sortOrder) {
+        final SQLiteDatabase db = dbHelper.getReadableDatabase();
+        int code = uriMatcher.match(uri);
+        Cursor resultCursor;
+        switch (code) {
+            case CODE_MOVIES:
+                resultCursor = db.query(
+                        FavoriteMoviesContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            case CODE_MOVIE_WITH_ID:
+                String movieId = uri.getLastPathSegment();
+                String[] newSelectionArgs = new String[]{movieId};
+                resultCursor = db.query(
+                        FavoriteMoviesContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID + " = ? ",
+                        newSelectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+            default:
+                throw new UnsupportedOperationException("Invalid URI: " + uri);
+        }
+        resultCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return resultCursor;
     }
 
     @Override

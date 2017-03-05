@@ -7,8 +7,7 @@
     <string name="themoviedb_most_popular_path">popular</string>
     <string name="themoviedb_highest_rated_path">top_rated</string>
 
-    <string name="connection_error_message">
-        Can\'t connect to server. Please check your connection or try again later.</string>
+    <string name="loading_movies_error_message">Failed to load movies.</string>
 
     <string name="scanner_delimiter">\\A</string>
 
@@ -26,9 +25,10 @@
 
     <string name="poster_content_description">Poster</string>
 
-    <string name="title_action_sort_by">Sort By…</string>
+    <string name="title_action_sort_by">Show…</string>
     <string name="title_action_most_popular">Most Popular</string>
     <string name="title_action_highest_rated">Highest Rated</string>
+    <string name="title_action_favorites">Favorites</string>
 
     <string name="intent_extra_movie_key">movie</string>
 

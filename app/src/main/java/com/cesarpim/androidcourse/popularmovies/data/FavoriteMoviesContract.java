@@ -25,6 +25,7 @@ public class FavoriteMoviesContract {
                 BASE_CONTENT_URI.buildUpon().appendPath(PATH_FAVORITES).build();
 
         public static final String TABLE_NAME = "favorites";
+        public static final String COLUMN_API_MOVIE_ID = "api_movie_id";
         public static final String COLUMN_ORIGINAL_TITLE = "original_title";
         public static final String COLUMN_POSTER_PATH = "poster_path";
     }

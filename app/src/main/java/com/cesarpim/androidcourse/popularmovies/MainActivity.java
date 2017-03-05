@@ -1,8 +1,12 @@
 package com.cesarpim.androidcourse.popularmovies;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -14,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.cesarpim.androidcourse.popularmovies.data.FavoriteMoviesContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,9 +36,11 @@ import java.util.Scanner;
 
 public class MainActivity
         extends AppCompatActivity
-        implements PostersAdapter.PosterClickListener {
+        implements PostersAdapter.PosterClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    private enum SortBy {MOST_POPULAR, HIGHEST_RATED}
+    private static final int FAVORITES_LOADER_ID = 1;
+
+    private enum SortBy {MOST_POPULAR, HIGHEST_RATED, FAVORITES}
 
     private Movie[] movies;
     private RecyclerView moviesRecyclerView;
@@ -65,11 +73,19 @@ public class MainActivity
 
         errorTextView = (TextView) findViewById(R.id.text_error_main);
         loadingProgressBar = (ProgressBar) findViewById(R.id.progress_loading);
-
         if (sortBy == null) {
             sortBy = SortBy.MOST_POPULAR;
         }
-        updateMoviesFromInternet();
+        updateMoviesFromSource();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // TODO: call getSupportLoaderManager().restartLoader(FAVORITES_LOADER_ID, null, this) on onStart or onResume if sortby favorites?
+//        if (sortBy == SortBy.FAVORITES) {
+//            getSupportLoaderManager().restartLoader(FAVORITES_LOADER_ID, null, this);
+//        }
     }
 
     private int calculatePosterGridSpan() {
@@ -85,10 +101,16 @@ public class MainActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
         if (sortBy != null) {
-            if (sortBy == SortBy.MOST_POPULAR) {
-                menu.findItem(R.id.action_most_popular).setChecked(false);
-            } else {
-                menu.findItem(R.id.action_highest_rated).setChecked(false);
+            switch (sortBy) {
+                case MOST_POPULAR:
+                    menu.findItem(R.id.action_most_popular).setChecked(false);
+                    break;
+                case HIGHEST_RATED:
+                    menu.findItem(R.id.action_highest_rated).setChecked(false);
+                    break;
+                case FAVORITES:
+                    menu.findItem(R.id.action_favorites).setChecked(false);
+                    break;
             }
         }
         return true;
@@ -103,11 +125,14 @@ public class MainActivity
             case R.id.action_highest_rated:
                 sortBy = SortBy.HIGHEST_RATED;
                 break;
+            case R.id.action_favorites:
+                sortBy = SortBy.FAVORITES;
+                break;
             default:
                 return super.onOptionsItemSelected(item);
         }
         item.setChecked(false);
-        updateMoviesFromInternet();
+        updateMoviesFromSource();
         return true;
     }
 
@@ -135,6 +160,18 @@ public class MainActivity
             e.printStackTrace();
         }
         return url;
+    }
+
+    private void updateMoviesFromSource() {
+        if (sortBy == SortBy.FAVORITES) {
+            updateMoviesFromContentProvider();
+        } else {
+            updateMoviesFromInternet();
+        }
+    }
+
+    private void updateMoviesFromContentProvider() {
+        getSupportLoaderManager().initLoader(FAVORITES_LOADER_ID, null, this);
     }
 
     private void updateMoviesFromInternet() {
@@ -224,6 +261,101 @@ public class MainActivity
             return moviesRead;
         }
 
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        // TODO: Use CursorLoader or AsyncTaskLoader??
+        return new CursorLoader(
+                this,
+                FavoriteMoviesContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                FavoriteMoviesContract.MovieEntry._ID);
+/*
+        return new AsyncTaskLoader<Cursor>(this) {
+
+//            Cursor loadedData = null;
+
+            @Override
+            protected void onStartLoading() {
+//                if (loadedData != null) {
+//                    deliverResult(loadedData);
+//                } else {
+                    Log.d("ON START LOADING", "YES");
+                    loadingProgressBar.setVisibility(View.VISIBLE);
+                    forceLoad();
+//                }
+            }
+
+            @Override
+            public Cursor loadInBackground() {
+                Cursor results;
+                Log.d("LOAD IN BACKGROUND", "YES");
+                try {
+                    results = getContentResolver().query(
+                            FavoriteMoviesContract.MovieEntry.CONTENT_URI,
+                            null,
+                            null,
+                            null,
+                            FavoriteMoviesContract.MovieEntry._ID);
+                } catch (Exception e) {
+                    results = null;
+                    e.printStackTrace();
+                }
+                return results;
+            }
+
+//            @Override
+//            public void deliverResult(Cursor data) {
+//                loadedData = data;
+//                super.deliverResult(data);
+//            }
+        };
+*/
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        // TODO: progress bar not active
+        // loadingProgressBar.setVisibility(View.INVISIBLE);
+        if (sortBy == SortBy.FAVORITES) {
+            if (data != null) {
+                movies = getMoviesFromCursor(data);
+                makePostersVisible();
+                postersAdapter.updateMovies(movies);
+            } else {
+                makeErrorVisible();
+            }
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // TODO: ???
+    }
+
+    private Movie[] getMoviesFromCursor (Cursor cursor) {
+        int numMovies = cursor.getCount();
+        Movie[] moviesRead = new Movie[numMovies];
+        Log.d("NUM MOVIES", "" + numMovies);
+        cursor.moveToFirst();
+        for (int i = 0; i < numMovies; i++) {
+            moviesRead[i] = new Movie(
+                    cursor.getInt(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID)),
+                    cursor.getString(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_POSTER_PATH)),
+                    "Bla",
+                    3,
+                    null);
+            Log.d("MOVIE READ" + i, moviesRead[i].toString());
+            cursor.moveToNext();
+        }
+        return moviesRead;
     }
 
 }
