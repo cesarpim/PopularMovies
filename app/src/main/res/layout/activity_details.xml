@@ -58,18 +58,29 @@
                     android:layout_toRightOf="@id/image_poster"
                     android:layout_toEndOf="@id/image_poster" />
 
-                <Button
-                    android:id="@+id/button_favorite"
-                    android:text="Add Favorite"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/details_element_distance"
-                    android:layout_below="@id/text_rating"
-                    android:layout_toRightOf="@id/image_poster"
-                    android:layout_toEndOf="@id/image_poster"
-                    android:onClick="onClickAddFavorite" />
+            <Button
+                android:id="@+id/button_add_favorite"
+                android:text="Add Favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/details_element_distance"
+                android:layout_below="@id/text_rating"
+                android:layout_toRightOf="@id/image_poster"
+                android:layout_toEndOf="@id/image_poster"
+                android:onClick="onClickAddFavorite" />
 
-                <TextView
+            <Button
+                android:id="@+id/button_delete_favorite"
+                android:text="Delete Favorite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/details_element_distance"
+                android:layout_below="@id/button_add_favorite"
+                android:layout_toRightOf="@id/image_poster"
+                android:layout_toEndOf="@id/image_poster"
+                android:onClick="onClickDeleteFavorite" />
+
+            <TextView
                     android:id="@+id/text_synopsis"
                     android:textSize="@dimen/medium_text_size"
                     android:layout_width="match_parent"

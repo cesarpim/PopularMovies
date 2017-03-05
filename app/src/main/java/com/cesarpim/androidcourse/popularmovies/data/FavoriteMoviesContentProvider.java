@@ -97,12 +97,11 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                 break;
             case CODE_MOVIE_WITH_ID:
                 String movieId = uri.getLastPathSegment();
-                String[] newSelectionArgs = new String[]{movieId};
                 resultCursor = db.query(
                         FavoriteMoviesContract.MovieEntry.TABLE_NAME,
                         projection,
                         FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID + " = ? ",
-                        newSelectionArgs,
+                        new String[]{movieId},
                         null,
                         null,
                         sortOrder);
@@ -120,18 +119,35 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
             @Nullable ContentValues contentValues,
             @Nullable String s,
             @Nullable String[] strings) {
-        return 0;
+        throw new UnsupportedOperationException("Unsupported operation");
     }
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String s, @Nullable String[] strings) {
-        return 0;
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        int code = uriMatcher.match(uri);
+        int numDeletedMovies;
+        switch (code) {
+            case CODE_MOVIE_WITH_ID:
+                String movieId = uri.getLastPathSegment();
+                numDeletedMovies = db.delete(
+                        FavoriteMoviesContract.MovieEntry.TABLE_NAME,
+                        FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID + " = ? ",
+                        new String[]{movieId});
+                break;
+            default:
+                throw new UnsupportedOperationException("Invalid URI: " + uri);
+        }
+        if (numDeletedMovies > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return numDeletedMovies;
     }
 
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+        throw new UnsupportedOperationException("Unsupported operation");
     }
 
 }

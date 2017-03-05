@@ -82,10 +82,26 @@ public class DetailsActivity extends AppCompatActivity {
             contentValues.put(
                     FavoriteMoviesContract.MovieEntry.COLUMN_POSTER_PATH,
                     movie.getPosterPath());
+            // TODO: Check if duplicate?
             Uri uri = getContentResolver()
                     .insert(FavoriteMoviesContract.MovieEntry.CONTENT_URI, contentValues);
             Log.d("INSERT URI", uri.toString());
-            // TODO: Check if duplicate?
+        }
+    }
+
+    public void onClickDeleteFavorite(View view) {
+        // TODO: Should be in a background thread?
+        if (movie != null) {
+            Uri uri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
+                    .appendPath(Integer.toString(movie.getId()))
+                    .build();
+            // TODO: Check if exists?
+            int numDeletedMovies = getContentResolver().delete(uri, null, null);
+            if ( numDeletedMovies > 0) {
+                // TODO: Restart the loader? Same in the insert?
+//            getSupportLoaderManager().restartLoader(MainActivity.FAVORITES_LOADER_ID, null, MainActivity.this);
+            }
+            Log.d("MOVIES DELETED", "" + numDeletedMovies);
         }
     }
 
