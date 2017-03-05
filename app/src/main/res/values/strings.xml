@@ -35,4 +35,6 @@
     <string name="details_release_date_format">MMM dd yyyy</string>
     <string name="details_rating_cap">/10</string>
 
+    <string name="favorite_movies_content_authority">com.cesarpim.androidcourse.popularmovies</string>
+
 </resources>
