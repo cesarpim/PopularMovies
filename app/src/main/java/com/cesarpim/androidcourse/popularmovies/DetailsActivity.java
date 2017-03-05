@@ -1,12 +1,17 @@
 package com.cesarpim.androidcourse.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cesarpim.androidcourse.popularmovies.data.FavoriteMoviesContract;
 import com.squareup.picasso.Picasso;
 
 import java.text.DateFormat;
@@ -65,4 +70,21 @@ public class DetailsActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    public void onClickAddFavorite(View view) {
+        if (movie != null) {
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(FavoriteMoviesContract.MovieEntry._ID, movie.getId());
+            contentValues.put(
+                    FavoriteMoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE,
+                    movie.getOriginalTitle());
+            contentValues.put(
+                    FavoriteMoviesContract.MovieEntry.COLUMN_POSTER_PATH,
+                    movie.getPosterPath());
+            Uri uri = getContentResolver()
+                    .insert(FavoriteMoviesContract.MovieEntry.CONTENT_URI, contentValues);
+            Log.d("INSERT URI", uri.toString());
+        }
+    }
+
 }
