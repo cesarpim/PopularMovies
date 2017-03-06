@@ -31,7 +31,10 @@ public class FavoriteMoviesDBHelper extends SQLiteOpenHelper {
                 MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 MovieEntry.COLUMN_API_MOVIE_ID + " INTEGER NOT NULL, " +
                 MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL);";
+                MovieEntry.COLUMN_POSTER_PATH + " TEXT NOT NULL, " +
+                MovieEntry.COLUMN_SYNOPSIS + " TEXT, " +
+                MovieEntry.COLUMN_RATING + " INTEGER NOT NULL, " +
+                MovieEntry.COLUMN_RELEASE_DATE + " INTEGER NOT NULL);";
         sqLiteDatabase.execSQL(CREATE_TABLE_SQL_STATEMENT);
     }
 

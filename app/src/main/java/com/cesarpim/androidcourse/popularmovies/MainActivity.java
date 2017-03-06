@@ -32,6 +32,7 @@ import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
 
 public class MainActivity
@@ -349,9 +350,12 @@ public class MainActivity
                             FavoriteMoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE)),
                     cursor.getString(cursor.getColumnIndex(
                             FavoriteMoviesContract.MovieEntry.COLUMN_POSTER_PATH)),
-                    "Bla",
-                    3,
-                    null);
+                    cursor.getString(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_SYNOPSIS)),
+                    cursor.getInt(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_RATING)),
+                    new Date(cursor.getLong(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE))));
             Log.d("MOVIE READ" + i, moviesRead[i].toString());
             cursor.moveToNext();
         }

@@ -82,6 +82,15 @@ public class DetailsActivity extends AppCompatActivity {
             contentValues.put(
                     FavoriteMoviesContract.MovieEntry.COLUMN_POSTER_PATH,
                     movie.getPosterPath());
+            contentValues.put(
+                    FavoriteMoviesContract.MovieEntry.COLUMN_SYNOPSIS,
+                    movie.getSynopsis());
+            contentValues.put(
+                    FavoriteMoviesContract.MovieEntry.COLUMN_RATING,
+                    movie.getRating());
+            contentValues.put(
+                    FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE,
+                    movie.getReleaseDate().getTime());
             // TODO: Check if duplicate?
             Uri uri = getContentResolver()
                     .insert(FavoriteMoviesContract.MovieEntry.CONTENT_URI, contentValues);

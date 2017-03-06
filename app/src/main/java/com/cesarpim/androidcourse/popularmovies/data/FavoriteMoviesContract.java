@@ -28,6 +28,9 @@ public class FavoriteMoviesContract {
         public static final String COLUMN_API_MOVIE_ID = "api_movie_id";
         public static final String COLUMN_ORIGINAL_TITLE = "original_title";
         public static final String COLUMN_POSTER_PATH = "poster_path";
+        public static final String COLUMN_SYNOPSIS = "synopsis";
+        public static final String COLUMN_RATING = "rating";
+        public static final String COLUMN_RELEASE_DATE = "release_date";
     }
 
 }
