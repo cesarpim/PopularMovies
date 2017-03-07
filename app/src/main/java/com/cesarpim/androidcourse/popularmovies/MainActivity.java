@@ -39,7 +39,7 @@ public class MainActivity
         extends AppCompatActivity
         implements PostersAdapter.PosterClickListener, LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final int FAVORITES_LOADER_ID = 1;
+    private static final int FAVORITES_LOADER_ID = 1001;
 
     private enum SortBy {MOST_POPULAR, HIGHEST_RATED, FAVORITES}
 

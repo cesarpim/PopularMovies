@@ -58,27 +58,23 @@
                     android:layout_toRightOf="@id/image_poster"
                     android:layout_toEndOf="@id/image_poster" />
 
-            <Button
-                android:id="@+id/button_add_favorite"
-                android:text="Add Favorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+            <ToggleButton
+                android:id="@+id/toggle_favorite"
+                android:button="@drawable/favorite_selector"
+                android:background="@null"
+                android:text=""
+                android:textOn=""
+                android:textOff=""
+                android:layout_width="@dimen/star_button_width"
+                android:layout_height="@dimen/star_button_height"
                 android:layout_marginTop="@dimen/details_element_distance"
-                android:layout_below="@id/text_rating"
-                android:layout_toRightOf="@id/image_poster"
-                android:layout_toEndOf="@id/image_poster"
-                android:onClick="onClickAddFavorite" />
-
-            <Button
-                android:id="@+id/button_delete_favorite"
-                android:text="Delete Favorite"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/details_element_distance"
-                android:layout_below="@id/button_add_favorite"
-                android:layout_toRightOf="@id/image_poster"
-                android:layout_toEndOf="@id/image_poster"
-                android:onClick="onClickDeleteFavorite" />
+                android:layout_marginLeft="@dimen/details_element_distance"
+                android:layout_marginStart="@dimen/details_element_distance"
+                android:layout_below="@id/text_release_date"
+                android:layout_toRightOf="@id/text_rating"
+                android:layout_toEndOf="@id/text_rating"
+                android:enabled="false"
+                android:onClick="onClickToggleFavorite" />
 
             <TextView
                     android:id="@+id/text_synopsis"

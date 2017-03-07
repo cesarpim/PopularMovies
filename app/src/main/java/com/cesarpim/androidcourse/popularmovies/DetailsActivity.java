@@ -1,8 +1,14 @@
 package com.cesarpim.androidcourse.popularmovies;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -10,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.cesarpim.androidcourse.popularmovies.data.FavoriteMoviesContract;
 import com.squareup.picasso.Picasso;
@@ -17,14 +24,20 @@ import com.squareup.picasso.Picasso;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity
+        extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<Boolean> {
+
+    private static final int FAVORITE_CHECK_LOADER_ID = 2001;
 
     private ImageView posterImageView;
     private TextView titleTextView;
     private TextView dateTextView;
     private TextView ratingTextView;
     private TextView synopsisTextView;
+    private ToggleButton favoriteToggleButton;
     private Movie movie = null;
+    private Uri movieUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +49,7 @@ public class DetailsActivity extends AppCompatActivity {
         dateTextView = (TextView) findViewById(R.id.text_release_date);
         ratingTextView = (TextView) findViewById(R.id.text_rating);
         synopsisTextView = (TextView) findViewById(R.id.text_synopsis);
+        favoriteToggleButton = (ToggleButton) findViewById(R.id.toggle_favorite);
         Intent launchIntent = getIntent();
         if (launchIntent.hasExtra(getString(R.string.intent_extra_movie_key))) {
             movie = (Movie) launchIntent.getSerializableExtra(getString(R.string.intent_extra_movie_key));
@@ -43,6 +57,10 @@ public class DetailsActivity extends AppCompatActivity {
         if (movie != null) {
             setupViews();
         }
+        movieUri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(movie.getId()))
+                .build();
+        getSupportLoaderManager().initLoader(FAVORITE_CHECK_LOADER_ID, null, this).forceLoad();
     }
 
     private void setupViews () {
@@ -71,7 +89,15 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
-    public void onClickAddFavorite(View view) {
+    public void onClickToggleFavorite(View view) {
+        if (((ToggleButton) view).isChecked()) {
+            addFavorite();
+        } else {
+            deleteFavorite();
+        }
+    }
+
+    private void addFavorite() {
         // TODO: Should be in a background thread?
         if (movie != null) {
             ContentValues contentValues = new ContentValues();
@@ -98,15 +124,12 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
-    public void onClickDeleteFavorite(View view) {
+    private void deleteFavorite() {
         // TODO: Should be in a background thread?
         if (movie != null) {
-            Uri uri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
-                    .appendPath(Integer.toString(movie.getId()))
-                    .build();
             // TODO: Check if exists?
-            int numDeletedMovies = getContentResolver().delete(uri, null, null);
-            if ( numDeletedMovies > 0) {
+            int numDeletedMovies = getContentResolver().delete(movieUri, null, null);
+            if (numDeletedMovies > 0) {
                 // TODO: Restart the loader? Same in the insert?
 //            getSupportLoaderManager().restartLoader(MainActivity.FAVORITES_LOADER_ID, null, MainActivity.this);
             }
@@ -114,4 +137,34 @@ public class DetailsActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+        return new AsyncTaskLoader<Boolean>(this) {
+
+            @Override
+            public Boolean loadInBackground() {
+                Boolean isFavorite = false;
+                Cursor queryResult = null;
+                try {
+                    queryResult = getContentResolver().query(movieUri, null, null, null, null);
+                } finally {
+                    if (queryResult != null) {
+                        isFavorite = queryResult.getCount() > 0;
+                        queryResult.close();
+                    }
+                }
+                return isFavorite;
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
+        favoriteToggleButton.setChecked(data);
+        favoriteToggleButton.setEnabled(true);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Boolean> loader) {
+    }
 }
