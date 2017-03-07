@@ -60,7 +60,7 @@ public class DetailsActivity
         movieUri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
                 .appendPath(Integer.toString(movie.getId()))
                 .build();
-        getSupportLoaderManager().initLoader(FAVORITE_CHECK_LOADER_ID, null, this).forceLoad();
+        getSupportLoaderManager().initLoader(FAVORITE_CHECK_LOADER_ID, null, this);
     }
 
     private void setupViews () {
@@ -140,6 +140,12 @@ public class DetailsActivity
     @Override
     public Loader<Boolean> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<Boolean>(this) {
+
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                forceLoad();
+            }
 
             @Override
             public Boolean loadInBackground() {
