@@ -6,16 +6,3 @@
         android:drawable="@android:drawable/btn_star_big_off" />
 </selector>
 
-    <!--
-        <item android:state_pressed="true"
-            android:drawable="@android:drawable/btn_star_big_on" />
-        <item android:state_focused="true"
-            android:drawable="@android:drawable/btn_star_big_on" />
-        <item android:state_hovered="true"
-            android:drawable="@android:drawable/btn_star_big_on" />
-        <item android:state_activated="true"
-            android:drawable="@android:drawable/btn_star_big_on" />
-        <item android:state_selected="true"
-            android:drawable="@android:drawable/btn_star_big_on" />
-        <item android:drawable="@android:drawable/btn_star_big_off" />
-    -->

@@ -80,15 +80,6 @@ public class MainActivity
         updateMoviesFromSource();
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // TODO: call getSupportLoaderManager().restartLoader(FAVORITES_LOADER_ID, null, this) on onStart or onResume if sortby favorites?
-//        if (sortBy == SortBy.FAVORITES) {
-//            getSupportLoaderManager().restartLoader(FAVORITES_LOADER_ID, null, this);
-//        }
-    }
-
     private int calculatePosterGridSpan() {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);

@@ -1,8 +1,6 @@
 package com.cesarpim.androidcourse.popularmovies;
 
 import android.content.ContentValues;
-import android.content.Context;
-import android.content.CursorLoader;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,10 +23,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class DetailsActivity
-        extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Boolean> {
+        extends AppCompatActivity {
 
     private static final int FAVORITE_CHECK_LOADER_ID = 2001;
+    private static final int FAVORITE_TOGGLE_LOADER_ID = 2002;
 
     private ImageView posterImageView;
     private TextView titleTextView;
@@ -38,6 +36,74 @@ public class DetailsActivity
     private ToggleButton favoriteToggleButton;
     private Movie movie = null;
     private Uri movieUri;
+
+    /**
+     * Loader that returns a boolean indicating whether the movie is or isn't in the favorites.
+     */
+    private LoaderManager.LoaderCallbacks<Boolean> favoriteCheckLoaderListener =
+            new LoaderManager.LoaderCallbacks<Boolean>() {
+                @Override
+                public Loader<Boolean> onCreateLoader(int id, Bundle args) {
+                    return new AsyncTaskLoader<Boolean>(DetailsActivity.this) {
+
+                        @Override
+                        public Boolean loadInBackground() {
+                            Boolean isFavorite = false;
+                            Cursor queryResult = null;
+                            try {
+                                queryResult = getContentResolver()
+                                        .query(movieUri, null, null, null, null);
+                            } finally {
+                                if (queryResult != null) {
+                                    isFavorite = queryResult.getCount() > 0;
+                                    queryResult.close();
+                                }
+                            }
+                            return isFavorite;
+                        }
+                    };
+                }
+
+                @Override
+                public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
+                    favoriteToggleButton.setChecked(data);
+                    favoriteToggleButton.setEnabled(true);
+                }
+
+                @Override
+                public void onLoaderReset(Loader<Boolean> loader) {
+                }
+            };
+
+    /**
+     * Loader that inserts/deletes the movie to/from the favorites
+     */
+    private LoaderManager.LoaderCallbacks<Void> favoriteToggleLoaderListener =
+            new LoaderManager.LoaderCallbacks<Void>() {
+                @Override
+                public Loader<Void> onCreateLoader(int id, Bundle args) {
+                    return new AsyncTaskLoader<Void>(DetailsActivity.this) {
+
+                        @Override
+                        public Void loadInBackground() {
+                            if (favoriteToggleButton.isChecked()) {
+                                addFavorite();
+                            } else {
+                                deleteFavorite();
+                            }
+                            return null;
+                        }
+                    };
+                }
+
+                @Override
+                public void onLoadFinished(Loader<Void> loader, Void data) {
+                }
+
+                @Override
+                public void onLoaderReset(Loader<Void> loader) {
+                }
+            };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +126,9 @@ public class DetailsActivity
         movieUri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
                 .appendPath(Integer.toString(movie.getId()))
                 .build();
-        getSupportLoaderManager().initLoader(FAVORITE_CHECK_LOADER_ID, null, this);
+        getSupportLoaderManager()
+                .initLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
+                .forceLoad();
     }
 
     private void setupViews () {
@@ -90,15 +158,12 @@ public class DetailsActivity
     }
 
     public void onClickToggleFavorite(View view) {
-        if (((ToggleButton) view).isChecked()) {
-            addFavorite();
-        } else {
-            deleteFavorite();
-        }
+        getSupportLoaderManager()
+                .initLoader(FAVORITE_TOGGLE_LOADER_ID, null, favoriteToggleLoaderListener)
+                .forceLoad();
     }
 
     private void addFavorite() {
-        // TODO: Should be in a background thread?
         if (movie != null) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID, movie.getId());
@@ -117,7 +182,6 @@ public class DetailsActivity
             contentValues.put(
                     FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE,
                     movie.getReleaseDate().getTime());
-            // TODO: Check if duplicate?
             Uri uri = getContentResolver()
                     .insert(FavoriteMoviesContract.MovieEntry.CONTENT_URI, contentValues);
             Log.d("INSERT URI", uri.toString());
@@ -125,52 +189,10 @@ public class DetailsActivity
     }
 
     private void deleteFavorite() {
-        // TODO: Should be in a background thread?
         if (movie != null) {
-            // TODO: Check if exists?
             int numDeletedMovies = getContentResolver().delete(movieUri, null, null);
-            if (numDeletedMovies > 0) {
-                // TODO: Restart the loader? Same in the insert?
-//            getSupportLoaderManager().restartLoader(MainActivity.FAVORITES_LOADER_ID, null, MainActivity.this);
-            }
             Log.d("MOVIES DELETED", "" + numDeletedMovies);
         }
     }
 
-    @Override
-    public Loader<Boolean> onCreateLoader(int id, Bundle args) {
-        return new AsyncTaskLoader<Boolean>(this) {
-
-            @Override
-            protected void onStartLoading() {
-                super.onStartLoading();
-                forceLoad();
-            }
-
-            @Override
-            public Boolean loadInBackground() {
-                Boolean isFavorite = false;
-                Cursor queryResult = null;
-                try {
-                    queryResult = getContentResolver().query(movieUri, null, null, null, null);
-                } finally {
-                    if (queryResult != null) {
-                        isFavorite = queryResult.getCount() > 0;
-                        queryResult.close();
-                    }
-                }
-                return isFavorite;
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
-        favoriteToggleButton.setChecked(data);
-        favoriteToggleButton.setEnabled(true);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Boolean> loader) {
-    }
 }
