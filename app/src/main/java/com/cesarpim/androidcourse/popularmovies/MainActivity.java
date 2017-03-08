@@ -48,7 +48,7 @@ public class MainActivity
     private TextView errorTextView;
     private ProgressBar loadingProgressBar;
     private PostersAdapter postersAdapter;
-    private SortBy sortBy = null;
+    private SortBy sortBy;
 
     @Override
     public void onPosterClick(int clickedPosterIndex) {
@@ -74,8 +74,10 @@ public class MainActivity
 
         errorTextView = (TextView) findViewById(R.id.text_error_main);
         loadingProgressBar = (ProgressBar) findViewById(R.id.progress_loading);
-        if (sortBy == null) {
+        if (savedInstanceState == null) {
             sortBy = SortBy.MOST_POPULAR;
+        } else {
+            sortBy = SortBy.values()[savedInstanceState.getInt(SORT_BY_KEY)];
         }
         updateMoviesFromSource();
     }
@@ -87,6 +89,12 @@ public class MainActivity
         // Although dimension is written in dp, getDimension returns it in pixels
         double posterMaxWidthPixels = getResources().getDimension(R.dimen.poster_maximum_width);
         return (int) Math.ceil(availableWidthPixels / posterMaxWidthPixels);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SORT_BY_KEY, sortBy.ordinal());
     }
 
     @Override
@@ -125,6 +133,7 @@ public class MainActivity
         }
         item.setChecked(false);
         updateMoviesFromSource();
+        moviesRecyclerView.scrollToPosition(0);
         return true;
     }
 
@@ -155,7 +164,14 @@ public class MainActivity
     }
 
     private void updateMoviesFromSource() {
-        getSupportLoaderManager().initLoader(MOVIES_LOADER_ID, null, this).forceLoad();
+//        Bundle loaderArgs = new Bundle();
+//        loaderArgs.putInt(SORT_BY_KEY, sortBy.ordinal());
+        LoaderManager manager = getSupportLoaderManager();
+        if (manager.getLoader(MOVIES_LOADER_ID) == null) {
+            manager.initLoader(MOVIES_LOADER_ID, null, this);
+        } else {
+            manager.restartLoader(MOVIES_LOADER_ID, null, this);
+        }
     }
 
     private String getResponseFromURL(URL url) throws IOException {
@@ -269,20 +285,20 @@ public class MainActivity
     }
 
     @Override
-    public Loader<Movie[]> onCreateLoader(int id, final Bundle args) {
+    public Loader<Movie[]> onCreateLoader(int id, Bundle args) {
         return new AsyncTaskLoader<Movie[]>(this) {
 
             @Override
             protected void onStartLoading() {
                 Log.d("ON START LOADING", "CALLED");
+                loadingProgressBar.setVisibility(View.VISIBLE);
                 forceLoad();
             }
 
             @Override
             public Movie[] loadInBackground() {
                 Log.d("LOAD IN BACKGROUND", "CALLED");
-                SortBy currentSortBy = sortBy;
-                Log.d("SORT BY", "" + currentSortBy);
+                SortBy currentSortBy = sortBy; //SortBy.values()[args.getInt(SORT_BY_KEY)];
                 Movie[] newMovies;
                 if (currentSortBy == SortBy.FAVORITES) {
                     newMovies = loadMoviesFromProvider();
@@ -297,6 +313,7 @@ public class MainActivity
     @Override
     public void onLoadFinished(Loader<Movie[]> loader, Movie[] data) {
         Log.d("ON LOAD FINISHED", "CALLED");
+        loadingProgressBar.setVisibility(View.INVISIBLE);
         if (data != null) {
             movies = data;
             makePostersVisible();
