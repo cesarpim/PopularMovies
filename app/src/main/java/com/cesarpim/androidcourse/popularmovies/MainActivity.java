@@ -3,9 +3,8 @@ package com.cesarpim.androidcourse.popularmovies;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,9 +36,10 @@ import java.util.Scanner;
 
 public class MainActivity
         extends AppCompatActivity
-        implements PostersAdapter.PosterClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+        implements PostersAdapter.PosterClickListener, LoaderManager.LoaderCallbacks<Movie[]> {
 
-    private static final int FAVORITES_LOADER_ID = 1001;
+    private static final int MOVIES_LOADER_ID = 1001;
+    private static final String SORT_BY_KEY = "sort by";
 
     private enum SortBy {MOST_POPULAR, HIGHEST_RATED, FAVORITES}
 
@@ -155,29 +155,166 @@ public class MainActivity
     }
 
     private void updateMoviesFromSource() {
-        if (sortBy == SortBy.FAVORITES) {
-            updateMoviesFromContentProvider();
-        } else {
-            updateMoviesFromInternet();
+        getSupportLoaderManager().initLoader(MOVIES_LOADER_ID, null, this).forceLoad();
+    }
+
+    private String getResponseFromURL(URL url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        String response = null;
+        try {
+            Scanner scanner = new Scanner(connection.getInputStream());
+            scanner.useDelimiter(getString(R.string.scanner_delimiter));
+            if (scanner.hasNext()) {
+                response = scanner.next();
+            }
+        } finally {
+            connection.disconnect();
         }
+        return response;
     }
 
-    private void updateMoviesFromContentProvider() {
-        getSupportLoaderManager().initLoader(FAVORITES_LOADER_ID, null, this);
+    private Movie[] getMoviesFromJSONString (String s) throws JSONException, ParseException {
+        DateFormat themoviedbDateFormat =
+                new SimpleDateFormat(getString(R.string.themoviedb_json_release_date_format));
+        JSONObject jsonObject = new JSONObject(s);
+        JSONArray jsonArray = jsonObject.getJSONArray(
+                getString(R.string.themoviedb_json_results_tag));
+        int numMovies = jsonArray.length();
+        Movie[] moviesRead = new Movie[numMovies];
+        for (int i = 0; i < numMovies; i++) {
+            JSONObject jsonMovie = jsonArray.getJSONObject(i);
+            moviesRead[i] = new Movie(
+                    jsonMovie.getInt(getString(R.string.themoviedb_json_id_tag)),
+                    jsonMovie.getString(getString(R.string.themoviedb_json_original_title_tag)),
+                    jsonMovie.getString(getString(R.string.themoviedb_json_poster_path_tag)),
+                    jsonMovie.getString(getString(R.string.themoviedb_json_synopsis_tag)),
+                    jsonMovie.getDouble(getString(R.string.themoviedb_json_rating_tag)),
+                    themoviedbDateFormat.parse(jsonMovie.getString(
+                            getString(R.string.themoviedb_json_release_date_tag))));
+        }
+        return moviesRead;
     }
 
-    private void updateMoviesFromInternet() {
+    private Movie[] getMoviesFromCursor (Cursor cursor) {
+        int numMovies = cursor.getCount();
+        Movie[] moviesRead = new Movie[numMovies];
+        Log.d("NUM MOVIES", "" + numMovies);
+        cursor.moveToFirst();
+        for (int i = 0; i < numMovies; i++) {
+            moviesRead[i] = new Movie(
+                    cursor.getInt(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID)),
+                    cursor.getString(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_POSTER_PATH)),
+                    cursor.getString(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_SYNOPSIS)),
+                    cursor.getInt(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_RATING)),
+                    new Date(cursor.getLong(cursor.getColumnIndex(
+                            FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE))));
+            Log.v("MOVIE READ" + i, moviesRead[i].toString());
+            cursor.moveToNext();
+        }
+        return moviesRead;
+    }
+
+    private Movie[] loadMoviesFromInternet(SortBy currentSortBy) {
+        Movie[] loadedMovies = null;
         URL url;
-        if (sortBy == SortBy.MOST_POPULAR) {
+        if (currentSortBy == SortBy.MOST_POPULAR) {
             url = buildMoviesURL(getString(R.string.themoviedb_most_popular_path));
         } else {
             url = buildMoviesURL(getString(R.string.themoviedb_highest_rated_path));
         }
         if (url != null) {
-            new DownloadMoviesTask().execute(url);
+            String response;
+            try {
+                response = getResponseFromURL(url);
+            } catch (IOException e) {
+                response = null;
+                e.printStackTrace();
+            }
+            if ((response != null) && (!response.equals(""))) {
+                try {
+                    loadedMovies = getMoviesFromJSONString(response);
+                } catch (JSONException|ParseException e) {
+                    loadedMovies = null;
+                    e.printStackTrace();
+                }
+            }
+        }
+        return loadedMovies;
+    }
+
+    private Movie[] loadMoviesFromProvider() {
+        Movie [] loadedMovies = null;
+        Cursor queryResults;
+        try {
+            queryResults = getContentResolver().query(
+                    FavoriteMoviesContract.MovieEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    FavoriteMoviesContract.MovieEntry._ID);
+        } catch (Exception e) {
+            queryResults = null;
+            e.printStackTrace();
+        }
+        if (queryResults != null) {
+            loadedMovies = getMoviesFromCursor(queryResults);
+        }
+        return loadedMovies;
+    }
+
+    @Override
+    public Loader<Movie[]> onCreateLoader(int id, final Bundle args) {
+        return new AsyncTaskLoader<Movie[]>(this) {
+
+            @Override
+            protected void onStartLoading() {
+                Log.d("ON START LOADING", "CALLED");
+                forceLoad();
+            }
+
+            @Override
+            public Movie[] loadInBackground() {
+                Log.d("LOAD IN BACKGROUND", "CALLED");
+                SortBy currentSortBy = sortBy;
+                Log.d("SORT BY", "" + currentSortBy);
+                Movie[] newMovies;
+                if (currentSortBy == SortBy.FAVORITES) {
+                    newMovies = loadMoviesFromProvider();
+                } else {
+                    newMovies = loadMoviesFromInternet(currentSortBy);
+                }
+                return newMovies;
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Movie[]> loader, Movie[] data) {
+        Log.d("ON LOAD FINISHED", "CALLED");
+        if (data != null) {
+            movies = data;
+            makePostersVisible();
+            postersAdapter.updateMovies(movies);
+        } else {
+            makeErrorVisible();
         }
     }
 
+    @Override
+    public void onLoaderReset(Loader<Movie[]> loader) {
+        // TODO: ???
+        Log.d("ON LOADER RESET", "CALLED");
+    }
+
+}
+
+/*
     private class DownloadMoviesTask extends AsyncTask<URL, Void, String> {
 
         @Override
@@ -215,46 +352,10 @@ public class MainActivity
                 makeErrorVisible();
             }
         }
-
-        private String getResponseFromURL(URL url) throws IOException {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            String response = null;
-            try {
-                Scanner scanner = new Scanner(connection.getInputStream());
-                scanner.useDelimiter(getString(R.string.scanner_delimiter));
-                if (scanner.hasNext()) {
-                    response = scanner.next();
-                }
-            } finally {
-                connection.disconnect();
-            }
-            return response;
-        }
-
-        private Movie[] getMoviesFromJSONString (String s) throws JSONException, ParseException {
-            DateFormat themoviedbDateFormat =
-                    new SimpleDateFormat(getString(R.string.themoviedb_json_release_date_format));
-            JSONObject jsonObject = new JSONObject(s);
-            JSONArray jsonArray = jsonObject.getJSONArray(
-                    getString(R.string.themoviedb_json_results_tag));
-            int numMovies = jsonArray.length();
-            Movie[] moviesRead = new Movie[numMovies];
-            for (int i = 0; i < numMovies; i++) {
-                JSONObject jsonMovie = jsonArray.getJSONObject(i);
-                moviesRead[i] = new Movie(
-                        jsonMovie.getInt(getString(R.string.themoviedb_json_id_tag)),
-                        jsonMovie.getString(getString(R.string.themoviedb_json_original_title_tag)),
-                        jsonMovie.getString(getString(R.string.themoviedb_json_poster_path_tag)),
-                        jsonMovie.getString(getString(R.string.themoviedb_json_synopsis_tag)),
-                        jsonMovie.getDouble(getString(R.string.themoviedb_json_rating_tag)),
-                        themoviedbDateFormat.parse(jsonMovie.getString(
-                                getString(R.string.themoviedb_json_release_date_tag))));
-            }
-            return moviesRead;
-        }
-
     }
+*/
 
+/*
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         // TODO: Use CursorLoader or AsyncTaskLoader??
@@ -265,6 +366,7 @@ public class MainActivity
                 null,
                 null,
                 FavoriteMoviesContract.MovieEntry._ID);
+*/
 /*
         return new AsyncTaskLoader<Cursor>(this) {
 
@@ -305,7 +407,8 @@ public class MainActivity
 //                super.deliverResult(data);
 //            }
         };
-*/
+*//*
+
     }
 
     @Override
@@ -327,30 +430,4 @@ public class MainActivity
     public void onLoaderReset(Loader<Cursor> loader) {
         // TODO: ???
     }
-
-    private Movie[] getMoviesFromCursor (Cursor cursor) {
-        int numMovies = cursor.getCount();
-        Movie[] moviesRead = new Movie[numMovies];
-        Log.d("NUM MOVIES", "" + numMovies);
-        cursor.moveToFirst();
-        for (int i = 0; i < numMovies; i++) {
-            moviesRead[i] = new Movie(
-                    cursor.getInt(cursor.getColumnIndex(
-                            FavoriteMoviesContract.MovieEntry.COLUMN_API_MOVIE_ID)),
-                    cursor.getString(cursor.getColumnIndex(
-                            FavoriteMoviesContract.MovieEntry.COLUMN_ORIGINAL_TITLE)),
-                    cursor.getString(cursor.getColumnIndex(
-                            FavoriteMoviesContract.MovieEntry.COLUMN_POSTER_PATH)),
-                    cursor.getString(cursor.getColumnIndex(
-                            FavoriteMoviesContract.MovieEntry.COLUMN_SYNOPSIS)),
-                    cursor.getInt(cursor.getColumnIndex(
-                            FavoriteMoviesContract.MovieEntry.COLUMN_RATING)),
-                    new Date(cursor.getLong(cursor.getColumnIndex(
-                            FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE))));
-            Log.d("MOVIE READ" + i, moviesRead[i].toString());
-            cursor.moveToNext();
-        }
-        return moviesRead;
-    }
-
-}
+*/
