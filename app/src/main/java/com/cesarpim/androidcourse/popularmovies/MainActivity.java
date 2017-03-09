@@ -2,7 +2,6 @@ package com.cesarpim.androidcourse.popularmovies;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -25,14 +24,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Scanner;
 
 public class MainActivity
         extends AppCompatActivity
@@ -147,22 +143,6 @@ public class MainActivity
         errorTextView.setVisibility(View.VISIBLE);
     }
 
-    private URL buildMoviesURL(String selectionPath) {
-        URL url;
-        Uri uri = Uri.parse(getString(R.string.themoviedb_base_url)).buildUpon()
-                .appendPath(selectionPath)
-                .appendQueryParameter(
-                        getString(R.string.themoviedb_param_key), BuildConfig.THEMOVIEDB_API_KEY)
-                .build();
-        try {
-            url = new URL(uri.toString());
-        } catch (MalformedURLException e) {
-            url = null;
-            e.printStackTrace();
-        }
-        return url;
-    }
-
     private void updateMoviesFromSource() {
 //        Bundle loaderArgs = new Bundle();
 //        loaderArgs.putInt(SORT_BY_KEY, sortBy.ordinal());
@@ -172,21 +152,6 @@ public class MainActivity
         } else {
             manager.restartLoader(MOVIES_LOADER_ID, null, this);
         }
-    }
-
-    private String getResponseFromURL(URL url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-        String response = null;
-        try {
-            Scanner scanner = new Scanner(connection.getInputStream());
-            scanner.useDelimiter(getString(R.string.scanner_delimiter));
-            if (scanner.hasNext()) {
-                response = scanner.next();
-            }
-        } finally {
-            connection.disconnect();
-        }
-        return response;
     }
 
     private Movie[] getMoviesFromJSONString (String s) throws JSONException, ParseException {
@@ -239,15 +204,14 @@ public class MainActivity
     private Movie[] loadMoviesFromInternet(SortBy currentSortBy) {
         Movie[] loadedMovies = null;
         URL url;
-        if (currentSortBy == SortBy.MOST_POPULAR) {
-            url = buildMoviesURL(getString(R.string.themoviedb_most_popular_path));
-        } else {
-            url = buildMoviesURL(getString(R.string.themoviedb_highest_rated_path));
-        }
+        url = MoviesApiUtils.buildMoviesURL(this,
+                getString( currentSortBy == SortBy.MOST_POPULAR ?
+                        R.string.themoviedb_most_popular_path :
+                        R.string.themoviedb_highest_rated_path));
         if (url != null) {
             String response;
             try {
-                response = getResponseFromURL(url);
+                response = MoviesApiUtils.getResponseFromURL(this, url);
             } catch (IOException e) {
                 response = null;
                 e.printStackTrace();
