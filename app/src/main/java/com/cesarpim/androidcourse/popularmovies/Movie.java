@@ -60,11 +60,14 @@ public class Movie implements Serializable {
 
     @Override
     public String toString() {
-        return "[" + id +
-                " " + originalTitle +
-                " " + posterPath +
-                " " + rating +
-                " " + releaseDate +
-                " " + synopsis + "]";
+        return "Movie{" +
+                "id=" + id +
+                ", originalTitle='" + originalTitle + '\'' +
+                ", posterPath='" + posterPath + '\'' +
+                ", synopsis='" + synopsis + '\'' +
+                ", rating=" + rating +
+                ", releaseDate=" + releaseDate +
+                '}';
     }
+
 }

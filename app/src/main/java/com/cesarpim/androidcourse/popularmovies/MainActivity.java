@@ -23,8 +23,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.IOException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -144,8 +142,6 @@ public class MainActivity
     }
 
     private void updateMoviesFromSource() {
-//        Bundle loaderArgs = new Bundle();
-//        loaderArgs.putInt(SORT_BY_KEY, sortBy.ordinal());
         LoaderManager manager = getSupportLoaderManager();
         if (manager.getLoader(MOVIES_LOADER_ID) == null) {
             manager.initLoader(MOVIES_LOADER_ID, null, this);
@@ -154,7 +150,7 @@ public class MainActivity
         }
     }
 
-    private Movie[] getMoviesFromJSONString (String s) throws JSONException, ParseException {
+    private Movie[] getMoviesFromJSONString(String s) throws JSONException, ParseException {
         DateFormat themoviedbDateFormat =
                 new SimpleDateFormat(getString(R.string.themoviedb_json_release_date_format));
         JSONObject jsonObject = new JSONObject(s);
@@ -203,26 +199,17 @@ public class MainActivity
 
     private Movie[] loadMoviesFromInternet(SortBy currentSortBy) {
         Movie[] loadedMovies = null;
-        URL url;
-        url = MoviesApiUtils.buildMoviesURL(this,
-                getString( currentSortBy == SortBy.MOST_POPULAR ?
+        String response = MoviesApiUtils.getResponse(
+                this,
+                new String[] { getString( currentSortBy == SortBy.MOST_POPULAR ?
                         R.string.themoviedb_most_popular_path :
-                        R.string.themoviedb_highest_rated_path));
-        if (url != null) {
-            String response;
+                        R.string.themoviedb_highest_rated_path)});
+        if ((response != null) && (!response.equals(""))) {
             try {
-                response = MoviesApiUtils.getResponseFromURL(this, url);
-            } catch (IOException e) {
-                response = null;
+                loadedMovies = getMoviesFromJSONString(response);
+            } catch (JSONException|ParseException e) {
+                loadedMovies = null;
                 e.printStackTrace();
-            }
-            if ((response != null) && (!response.equals(""))) {
-                try {
-                    loadedMovies = getMoviesFromJSONString(response);
-                } catch (JSONException|ParseException e) {
-                    loadedMovies = null;
-                    e.printStackTrace();
-                }
             }
         }
         return loadedMovies;
@@ -262,7 +249,7 @@ public class MainActivity
             @Override
             public Movie[] loadInBackground() {
                 Log.d(MainActivity.class.getName(), "loadInBackground CALLED");
-                SortBy currentSortBy = sortBy; //SortBy.values()[args.getInt(SORT_BY_KEY)];
+                SortBy currentSortBy = sortBy;
                 Movie[] newMovies;
                 if (currentSortBy == SortBy.FAVORITES) {
                     newMovies = loadMoviesFromProvider();

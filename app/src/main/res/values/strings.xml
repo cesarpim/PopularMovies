@@ -7,6 +7,8 @@
     <string name="themoviedb_param_key" translatable="false">api_key</string>
     <string name="themoviedb_most_popular_path" translatable="false">popular</string>
     <string name="themoviedb_highest_rated_path" translatable="false">top_rated</string>
+    <string name="themoviedb_trailers_path" translatable="false">videos</string>
+    <string name="themoviedb_reviews_path" translatable="false">reviews</string>
 
     <string name="loading_movies_error_message">Failed to load movies.</string>
 
@@ -20,6 +22,10 @@
     <string name="themoviedb_json_rating_tag" translatable="false">vote_average</string>
     <string name="themoviedb_json_release_date_tag" translatable="false">release_date</string>
     <string name="themoviedb_json_release_date_format" translatable="false">yyyy-MM-dd</string>
+
+    <string name="themoviedb_json_trailer_results_tag" translatable="false">results</string>
+    <string name="themoviedb_json_trailer_title_tag" translatable="false">name</string>
+    <string name="themoviedb_json_trailer_youtube_key_tag" translatable="false">key</string>
 
     <string name="themoviedb_image_base_url" translatable="false">
         http://image.tmdb.org/t/p/</string>

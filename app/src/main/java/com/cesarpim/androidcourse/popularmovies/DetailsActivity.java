@@ -19,7 +19,12 @@ import android.widget.ToggleButton;
 import com.cesarpim.androidcourse.popularmovies.data.FavoriteMoviesContract;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class DetailsActivity
@@ -36,6 +41,7 @@ public class DetailsActivity
     private ToggleButton favoriteToggleButton;
     private Movie movie = null;
     private Uri movieUri;
+    private Trailer[] trailers;
 
     /**
      * Loader that returns a boolean indicating whether the movie is or isn't in the favorites.
@@ -48,6 +54,8 @@ public class DetailsActivity
 
                         @Override
                         public Boolean loadInBackground() {
+                            // TODO: THIS IS SUPPOSED TO GO TO ITS OWN LOADER PERHAPS BOUND TO THE ACTIVITY
+                            trailers = loadTrailersFromInternet(movie.getId());
                             Boolean isFavorite = false;
                             Cursor queryResult = null;
                             try {
@@ -184,15 +192,53 @@ public class DetailsActivity
                     movie.getReleaseDate().getTime());
             Uri uri = getContentResolver()
                     .insert(FavoriteMoviesContract.MovieEntry.CONTENT_URI, contentValues);
-            Log.d("INSERT URI", uri.toString());
+            Log.d(DetailsActivity.class.getName(), "INSERT URI: " + uri);
         }
     }
 
     private void deleteFavorite() {
         if (movie != null) {
             int numDeletedMovies = getContentResolver().delete(movieUri, null, null);
-            Log.d("MOVIES DELETED", "" + numDeletedMovies);
+            Log.d(DetailsActivity.class.getName(), "MOVIES DELETED: " + numDeletedMovies);
         }
+    }
+
+    private Trailer[] loadTrailersFromInternet(int movieId) {
+        Trailer[] loadedTrailers = null;
+        String response = MoviesApiUtils.getResponse(
+                this,
+                new String[] {"" + movieId, getString(R.string.themoviedb_trailers_path)});
+        Log.v(DetailsActivity.class.getName(), "TRAILERS JSON: " + response);
+        if ((response != null) && (!response.equals(""))) {
+            try {
+                loadedTrailers = getTrailersFromJSONString(response);
+            } catch (JSONException|ParseException e) {
+                loadedTrailers = null;
+                e.printStackTrace();
+            }
+        }
+        // TODO: DEBUG
+        for (Trailer trailer : loadedTrailers) {
+            Log.v(DetailsActivity.class.getName(), trailer.toString());
+        }
+        return loadedTrailers;
+    }
+
+    private Trailer[] getTrailersFromJSONString(String s) throws JSONException, ParseException {
+        JSONObject jsonObject = new JSONObject(s);
+        JSONArray jsonArray = jsonObject.getJSONArray(
+                getString(R.string.themoviedb_json_trailer_results_tag));
+        int numTrailers = jsonArray.length();
+        Trailer[] trailersRead = new Trailer[numTrailers];
+        for (int i = 0; i < numTrailers; i++) {
+            JSONObject jsonTrailer = jsonArray.getJSONObject(i);
+            trailersRead[i] = new Trailer(
+                    jsonTrailer.getString(
+                            getString(R.string.themoviedb_json_trailer_title_tag)),
+                    jsonTrailer.getString(
+                            getString(R.string.themoviedb_json_trailer_youtube_key_tag)));
+        }
+        return trailersRead;
     }
 
 }

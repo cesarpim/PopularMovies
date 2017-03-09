@@ -21,13 +21,29 @@ public class MoviesApiUtils {
 
     private MoviesApiUtils() {}
 
-    public static URL buildMoviesURL(Context context, String selectionPath) {
+    public static String getResponse(Context context, String[] pathSegments) {
+        URL url = buildMoviesURL(context, pathSegments);
+        String response = null;
+        if (url != null) {
+            try {
+                response = getResponseFromURL(context, url);
+            } catch (IOException e) {
+                response = null;
+                e.printStackTrace();
+            }
+        }
+        return response;
+    }
+
+    private static URL buildMoviesURL(Context context, String[] extraPathSegments) {
         URL url;
-        Uri uri = Uri.parse(context.getString(R.string.themoviedb_base_url)).buildUpon()
-                .appendPath(selectionPath)
-                .appendQueryParameter(
-                        context.getString(R.string.themoviedb_param_key),
-                        BuildConfig.THEMOVIEDB_API_KEY)
+        Uri uri = Uri.parse(context.getString(R.string.themoviedb_base_url));
+        for (String segment : extraPathSegments) {
+            uri = uri.buildUpon().appendPath(segment).build();
+        }
+        uri = uri.buildUpon().appendQueryParameter(
+                context.getString(R.string.themoviedb_param_key),
+                BuildConfig.THEMOVIEDB_API_KEY)
                 .build();
         try {
             url = new URL(uri.toString());
@@ -38,7 +54,7 @@ public class MoviesApiUtils {
         return url;
     }
 
-    public static String getResponseFromURL(Context context, URL url) throws IOException {
+    private static String getResponseFromURL(Context context, URL url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         String response = null;
         try {
