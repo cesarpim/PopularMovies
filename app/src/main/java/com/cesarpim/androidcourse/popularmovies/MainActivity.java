@@ -214,7 +214,7 @@ public class MainActivity
     private Movie[] getMoviesFromCursor (Cursor cursor) {
         int numMovies = cursor.getCount();
         Movie[] moviesRead = new Movie[numMovies];
-        Log.d("NUM MOVIES", "" + numMovies);
+        Log.d(MainActivity.class.getName(), "numMovies = " + numMovies);
         cursor.moveToFirst();
         for (int i = 0; i < numMovies; i++) {
             moviesRead[i] = new Movie(
@@ -230,7 +230,7 @@ public class MainActivity
                             FavoriteMoviesContract.MovieEntry.COLUMN_RATING)),
                     new Date(cursor.getLong(cursor.getColumnIndex(
                             FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE))));
-            Log.v("MOVIE READ" + i, moviesRead[i].toString());
+            Log.v(MainActivity.class.getName(), "movie " + i + " READ = " + moviesRead[i]);
             cursor.moveToNext();
         }
         return moviesRead;
@@ -290,14 +290,14 @@ public class MainActivity
 
             @Override
             protected void onStartLoading() {
-                Log.d("ON START LOADING", "CALLED");
+                Log.d(MainActivity.class.getName(), "onStartLoading CALLED");
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 forceLoad();
             }
 
             @Override
             public Movie[] loadInBackground() {
-                Log.d("LOAD IN BACKGROUND", "CALLED");
+                Log.d(MainActivity.class.getName(), "loadInBackground CALLED");
                 SortBy currentSortBy = sortBy; //SortBy.values()[args.getInt(SORT_BY_KEY)];
                 Movie[] newMovies;
                 if (currentSortBy == SortBy.FAVORITES) {
@@ -312,7 +312,7 @@ public class MainActivity
 
     @Override
     public void onLoadFinished(Loader<Movie[]> loader, Movie[] data) {
-        Log.d("ON LOAD FINISHED", "CALLED");
+        Log.d(MainActivity.class.getName(), "onLoadFinished CALLED");
         loadingProgressBar.setVisibility(View.INVISIBLE);
         if (data != null) {
             movies = data;
@@ -326,7 +326,7 @@ public class MainActivity
     @Override
     public void onLoaderReset(Loader<Movie[]> loader) {
         // TODO: ???
-        Log.d("ON LOADER RESET", "CALLED");
+        Log.d(MainActivity.class.getName(), "onLoaderReset CALLED");
     }
 
 }
