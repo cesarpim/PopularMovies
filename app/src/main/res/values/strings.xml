@@ -2,39 +2,42 @@
     <string name="app_name">Popular Movies</string>
     <string name="details_activity_title">Movie Details</string>
 
-    <string name="themoviedb_base_url">https://api.themoviedb.org/3/movie/</string>
-    <string name="themoviedb_param_key">api_key</string>
-    <string name="themoviedb_most_popular_path">popular</string>
-    <string name="themoviedb_highest_rated_path">top_rated</string>
+    <string name="themoviedb_base_url" translatable="false">
+        https://api.themoviedb.org/3/movie/</string>
+    <string name="themoviedb_param_key" translatable="false">api_key</string>
+    <string name="themoviedb_most_popular_path" translatable="false">popular</string>
+    <string name="themoviedb_highest_rated_path" translatable="false">top_rated</string>
 
     <string name="loading_movies_error_message">Failed to load movies.</string>
 
-    <string name="scanner_delimiter">\\A</string>
+    <string name="scanner_delimiter" translatable="false">\\A</string>
 
-    <string name="themoviedb_json_results_tag">results</string>
-    <string name="themoviedb_json_id_tag">id</string>
-    <string name="themoviedb_json_original_title_tag">original_title</string>
-    <string name="themoviedb_json_poster_path_tag">poster_path</string>
-    <string name="themoviedb_json_synopsis_tag">overview</string>
-    <string name="themoviedb_json_rating_tag">vote_average</string>
-    <string name="themoviedb_json_release_date_tag">release_date</string>
-    <string name="themoviedb_json_release_date_format">yyyy-MM-dd</string>
+    <string name="themoviedb_json_results_tag" translatable="false">results</string>
+    <string name="themoviedb_json_id_tag" translatable="false">id</string>
+    <string name="themoviedb_json_original_title_tag" translatable="false">original_title</string>
+    <string name="themoviedb_json_poster_path_tag" translatable="false">poster_path</string>
+    <string name="themoviedb_json_synopsis_tag" translatable="false">overview</string>
+    <string name="themoviedb_json_rating_tag" translatable="false">vote_average</string>
+    <string name="themoviedb_json_release_date_tag" translatable="false">release_date</string>
+    <string name="themoviedb_json_release_date_format" translatable="false">yyyy-MM-dd</string>
 
-    <string name="themoviedb_image_base_url">http://image.tmdb.org/t/p/</string>
-    <string name="themoviedb_image_size">w185</string>
+    <string name="themoviedb_image_base_url" translatable="false">
+        http://image.tmdb.org/t/p/</string>
+    <string name="themoviedb_image_size" translatable="false">w185</string>
 
     <string name="poster_content_description">Poster</string>
 
-    <string name="title_action_sort_by">Show…</string>
+    <string name="title_action_sort_by">Sort by…</string>
     <string name="title_action_most_popular">Most Popular</string>
     <string name="title_action_highest_rated">Highest Rated</string>
     <string name="title_action_favorites">Favorites</string>
 
-    <string name="intent_extra_movie_key">movie</string>
+    <string name="intent_extra_movie_key" translatable="false">movie</string>
 
-    <string name="details_release_date_format">MMM dd yyyy</string>
+    <string name="details_release_date_format" translatable="false">MMM dd yyyy</string>
     <string name="details_rating_cap">/10</string>
 
-    <string name="favorite_movies_content_authority">com.cesarpim.androidcourse.popularmovies</string>
+    <string name="favorite_movies_content_authority" translatable="false">
+        com.cesarpim.androidcourse.popularmovies</string>
 
 </resources>
