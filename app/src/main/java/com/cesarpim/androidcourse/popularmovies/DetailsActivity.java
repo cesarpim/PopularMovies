@@ -28,10 +28,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class DetailsActivity
-        extends AppCompatActivity {
+        extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<String> {
 
-    private static final int FAVORITE_CHECK_LOADER_ID = 2001;
-    private static final int FAVORITE_TOGGLE_LOADER_ID = 2002;
+    private static final int TRAILERS_LOADER_ID = 2001;
+    private static final int REVIEWS_LOADER_ID = 2002;
+    private static final int FAVORITE_CHECK_LOADER_ID = 2003;
+    private static final int FAVORITE_TOGGLE_LOADER_ID = 2004;
 
     private ImageView posterImageView;
     private TextView titleTextView;
@@ -54,8 +57,6 @@ public class DetailsActivity
 
                         @Override
                         public Boolean loadInBackground() {
-                            // TODO: THIS IS SUPPOSED TO GO TO ITS OWN LOADER PERHAPS BOUND TO THE ACTIVITY
-                            trailers = loadTrailersFromInternet(movie.getId());
                             Boolean isFavorite = false;
                             Cursor queryResult = null;
                             try {
@@ -137,6 +138,15 @@ public class DetailsActivity
         getSupportLoaderManager()
                 .initLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
                 .forceLoad();
+        trailers = new Trailer[0]; // TODO: INICIALIZAR ADAPTER DEPOIS DISTO
+
+        LoaderManager manager = getSupportLoaderManager();
+        if (manager.getLoader(TRAILERS_LOADER_ID) == null) {
+            manager.initLoader(TRAILERS_LOADER_ID, null, this);
+        } else {
+            manager.restartLoader(TRAILERS_LOADER_ID, null, this);
+        }
+
     }
 
     private void setupViews () {
@@ -203,27 +213,6 @@ public class DetailsActivity
         }
     }
 
-    private Trailer[] loadTrailersFromInternet(int movieId) {
-        Trailer[] loadedTrailers = null;
-        String response = MoviesApiUtils.getResponse(
-                this,
-                new String[] {"" + movieId, getString(R.string.themoviedb_trailers_path)});
-        Log.v(DetailsActivity.class.getName(), "TRAILERS JSON: " + response);
-        if ((response != null) && (!response.equals(""))) {
-            try {
-                loadedTrailers = getTrailersFromJSONString(response);
-            } catch (JSONException|ParseException e) {
-                loadedTrailers = null;
-                e.printStackTrace();
-            }
-        }
-        // TODO: DEBUG
-        for (Trailer trailer : loadedTrailers) {
-            Log.v(DetailsActivity.class.getName(), trailer.toString());
-        }
-        return loadedTrailers;
-    }
-
     private Trailer[] getTrailersFromJSONString(String s) throws JSONException, ParseException {
         JSONObject jsonObject = new JSONObject(s);
         JSONArray jsonArray = jsonObject.getJSONArray(
@@ -241,4 +230,58 @@ public class DetailsActivity
         return trailersRead;
     }
 
+    @Override
+    public Loader<String> onCreateLoader(int id, Bundle args) {
+        Loader<String> loader;
+        switch (id) {
+            case TRAILERS_LOADER_ID:
+                loader = new AsyncTaskLoader<String>(this) {
+                    @Override
+                    protected void onStartLoading() {
+                        super.onStartLoading();
+                        forceLoad();
+                    }
+                    @Override
+                    public String loadInBackground() {
+                        return MoviesApiUtils.getResponse(
+                                DetailsActivity.this,
+                                new String[] {"" + movie.getId(),
+                                        getString(R.string.themoviedb_trailers_path)});
+                    }
+                };
+                break;
+            default:
+                throw new RuntimeException("Invalid loader id: " + id);
+        }
+        return loader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<String> loader, String data) {
+        int id = loader.getId();
+        switch (id) {
+            case TRAILERS_LOADER_ID:
+                if ((data != null) && (!data.equals(""))) {
+                    try {
+                        trailers = getTrailersFromJSONString(data);
+                        // TODO: JUST FOR DEBUG:
+                        for (Trailer trailer : trailers) {
+                            Log.v(DetailsActivity.class.getName(), trailer.toString());
+                        }
+                    } catch (JSONException|ParseException e) {
+                        trailers = new Trailer[0];
+                        e.printStackTrace();
+                    }
+                    // TODO: adapter create / update!
+                }
+                break;
+            default:
+                throw new RuntimeException("Invalid loader id: " + id);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<String> loader) {
+        // TODO: FAZER QQ COISA COM O ADAPTER?
+    }
 }
