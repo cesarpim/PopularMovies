@@ -59,9 +59,7 @@ class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterViewHolde
         void onPosterClick(int clickedPosterIndex);
     }
 
-    class PosterViewHolder
-            extends RecyclerView.ViewHolder
-            implements View.OnClickListener {
+    class PosterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         ImageView poster;
 
@@ -73,8 +71,8 @@ class PostersAdapter extends RecyclerView.Adapter<PostersAdapter.PosterViewHolde
 
         @Override
         public void onClick(View view) {
-            int clickedPosition = getAdapterPosition();
-            clickListener.onPosterClick(clickedPosition);
+            clickListener.onPosterClick(getAdapterPosition());
         }
     }
+
 }

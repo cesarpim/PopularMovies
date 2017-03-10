@@ -32,6 +32,7 @@
     <string name="themoviedb_image_size" translatable="false">w185</string>
 
     <string name="poster_content_description">Poster</string>
+    <string name="play_trailer_content_description">Play</string>
 
     <string name="title_action_sort_by">Sort by…</string>
     <string name="title_action_most_popular">Most Popular</string>

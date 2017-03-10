@@ -9,6 +9,8 @@ import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +31,7 @@ import java.text.SimpleDateFormat;
 
 public class DetailsActivity
         extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<String> {
+        implements TrailersAdapter.TrailerClickListener, LoaderManager.LoaderCallbacks<String> {
 
     private static final int TRAILERS_LOADER_ID = 2001;
     private static final int REVIEWS_LOADER_ID = 2002;
@@ -42,6 +44,8 @@ public class DetailsActivity
     private TextView ratingTextView;
     private TextView synopsisTextView;
     private ToggleButton favoriteToggleButton;
+    private RecyclerView trailersRecyclerView;
+    private TrailersAdapter trailersAdapter;
     private Movie movie = null;
     private Uri movieUri;
     private Trailer[] trailers;
@@ -72,13 +76,11 @@ public class DetailsActivity
                         }
                     };
                 }
-
                 @Override
                 public void onLoadFinished(Loader<Boolean> loader, Boolean data) {
                     favoriteToggleButton.setChecked(data);
                     favoriteToggleButton.setEnabled(true);
                 }
-
                 @Override
                 public void onLoaderReset(Loader<Boolean> loader) {
                 }
@@ -104,15 +106,18 @@ public class DetailsActivity
                         }
                     };
                 }
-
                 @Override
                 public void onLoadFinished(Loader<Void> loader, Void data) {
                 }
-
                 @Override
                 public void onLoaderReset(Loader<Void> loader) {
                 }
             };
+
+    @Override
+    public void onTrailerClick(String clickedTrailerYoutubeKey) {
+        Log.d(DetailsActivity.class.getName(), "TRAILER KEY: " + clickedTrailerYoutubeKey);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +130,10 @@ public class DetailsActivity
         ratingTextView = (TextView) findViewById(R.id.text_rating);
         synopsisTextView = (TextView) findViewById(R.id.text_synopsis);
         favoriteToggleButton = (ToggleButton) findViewById(R.id.toggle_favorite);
+        trailersRecyclerView = (RecyclerView) findViewById(R.id.recycler_trailers);
+        trailersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        trailersRecyclerView.setHasFixedSize(true);
+
         Intent launchIntent = getIntent();
         if (launchIntent.hasExtra(getString(R.string.intent_extra_movie_key))) {
             movie = (Movie) launchIntent.getSerializableExtra(getString(R.string.intent_extra_movie_key));
@@ -250,6 +259,10 @@ public class DetailsActivity
                     }
                 };
                 break;
+            case REVIEWS_LOADER_ID:
+                // TODO
+                loader = null;
+                break;
             default:
                 throw new RuntimeException("Invalid loader id: " + id);
         }
@@ -273,7 +286,12 @@ public class DetailsActivity
                         e.printStackTrace();
                     }
                     // TODO: adapter create / update!
+                    trailersRecyclerView
+                            .setAdapter(new TrailersAdapter(trailers, DetailsActivity.this));
                 }
+                break;
+            case REVIEWS_LOADER_ID:
+                // TODO
                 break;
             default:
                 throw new RuntimeException("Invalid loader id: " + id);
@@ -282,6 +300,7 @@ public class DetailsActivity
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
-        // TODO: FAZER QQ COISA COM O ADAPTER?
+        // TODO: FAZER QQ COISA COM OS ADAPTERS?
     }
+
 }
