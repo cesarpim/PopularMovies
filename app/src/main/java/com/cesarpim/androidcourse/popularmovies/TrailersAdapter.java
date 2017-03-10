@@ -8,12 +8,20 @@ import android.widget.TextView;
 
 /**
  * Created by CesarPim on 09-03-2017.
+ *
+ * Adapter for the RecyclerView of movie trailers.
+ *
+ * @author CesarPim
  */
 
 class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.TrailerViewHolder> {
 
     private final TrailerClickListener clickListener;
     private Trailer[] trailers;
+
+    public interface TrailerClickListener {
+        void onTrailerClick(String clickedTrailerYoutubeKey);
+    }
 
     public TrailersAdapter(Trailer[] trailers, TrailerClickListener clickListener) {
         this.trailers = trailers;
@@ -42,10 +50,6 @@ class TrailersAdapter extends RecyclerView.Adapter<TrailersAdapter.TrailerViewHo
     public void updateTrailers(Trailer[] trailers) {
         this.trailers = trailers;
         notifyDataSetChanged();
-    }
-
-    public interface TrailerClickListener {
-        void onTrailerClick(String clickedTrailerYoutubeKey);
     }
 
     class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

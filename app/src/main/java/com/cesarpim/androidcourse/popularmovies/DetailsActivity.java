@@ -45,9 +45,11 @@ public class DetailsActivity
     private TextView synopsisTextView;
     private ToggleButton favoriteToggleButton;
     private RecyclerView trailersRecyclerView;
+    private RecyclerView reviewsRecyclerView;
     private Movie movie = null;
     private Uri movieUri;
-    private Trailer[] trailers;
+//    private Trailer[] trailers;
+//    private Review[] reviews;
 
     /**
      * Loader that returns a boolean indicating whether the movie is or isn't in the favorites.
@@ -138,6 +140,9 @@ public class DetailsActivity
         trailersRecyclerView = (RecyclerView) findViewById(R.id.recycler_trailers);
         trailersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         trailersRecyclerView.setHasFixedSize(true);
+        reviewsRecyclerView = (RecyclerView) findViewById(R.id.recycler_reviews);
+        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        reviewsRecyclerView.setHasFixedSize(true);
 
         Intent launchIntent = getIntent();
         if (launchIntent.hasExtra(getString(R.string.intent_extra_movie_key))) {
@@ -155,12 +160,16 @@ public class DetailsActivity
 //        trailers = new Trailer[0]; // INICIALIZAR ADAPTER DEPOIS DISTO
 
         LoaderManager manager = getSupportLoaderManager();
-        if (manager.getLoader(TRAILERS_LOADER_ID) == null) {
-            manager.initLoader(TRAILERS_LOADER_ID, null, this);
-        } else {
-            manager.restartLoader(TRAILERS_LOADER_ID, null, this);
-        }
+        runLoaderFromStart(manager, TRAILERS_LOADER_ID);
+        runLoaderFromStart(manager, REVIEWS_LOADER_ID);
+    }
 
+    private void runLoaderFromStart(LoaderManager manager, int loaderID) {
+        if (manager.getLoader(loaderID) == null) {
+            manager.initLoader(loaderID, null, this);
+        } else {
+            manager.restartLoader(loaderID, null, this);
+        }
     }
 
     private void setupViews () {
@@ -244,34 +253,50 @@ public class DetailsActivity
         return trailersRead;
     }
 
+    private Review[] getReviewsFromJSONString(String s) throws JSONException, ParseException {
+        JSONObject jsonObject = new JSONObject(s);
+        JSONArray jsonArray = jsonObject.getJSONArray(
+                getString(R.string.themoviedb_json_review_results_tag));
+        int numReviews = jsonArray.length();
+        Review[] reviewsRead = new Review[numReviews];
+        for (int i = 0; i < numReviews; i++) {
+            JSONObject jsonTrailer = jsonArray.getJSONObject(i);
+            reviewsRead[i] = new Review(
+                    jsonTrailer.getString(
+                            getString(R.string.themoviedb_json_review_author_tag)),
+                    jsonTrailer.getString(
+                            getString(R.string.themoviedb_json_review_content_key_tag)));
+        }
+        return reviewsRead;
+    }
+
     @Override
     public Loader<String> onCreateLoader(int id, Bundle args) {
-        Loader<String> loader;
+        final int pathResId;
         switch (id) {
             case TRAILERS_LOADER_ID:
-                loader = new AsyncTaskLoader<String>(this) {
-                    @Override
-                    protected void onStartLoading() {
-                        super.onStartLoading();
-                        forceLoad();
-                    }
-                    @Override
-                    public String loadInBackground() {
-                        return MoviesApiUtils.getResponse(
-                                DetailsActivity.this,
-                                new String[] {"" + movie.getId(),
-                                        getString(R.string.themoviedb_trailers_path)});
-                    }
-                };
+                pathResId = R.string.themoviedb_trailers_path;
                 break;
             case REVIEWS_LOADER_ID:
-                // TODO
-                loader = null;
+                pathResId = R.string.themoviedb_reviews_path;
                 break;
             default:
                 throw new RuntimeException("Invalid loader id: " + id);
         }
-        return loader;
+        return new AsyncTaskLoader<String>(this) {
+            @Override
+            protected void onStartLoading() {
+                super.onStartLoading();
+                forceLoad();
+            }
+            @Override
+            public String loadInBackground() {
+                return MoviesApiUtils.getResponse(
+                        DetailsActivity.this,
+                        new String[] {"" + movie.getId(),
+                                getString(pathResId)});
+            }
+        };
     }
 
     @Override
@@ -280,6 +305,7 @@ public class DetailsActivity
         switch (id) {
             case TRAILERS_LOADER_ID:
                 if ((data != null) && (!data.equals(""))) {
+                    Trailer[] trailers;
                     try {
                         trailers = getTrailersFromJSONString(data);
                         // TODO: JUST FOR DEBUG:
@@ -296,7 +322,19 @@ public class DetailsActivity
                 }
                 break;
             case REVIEWS_LOADER_ID:
-                // TODO
+                if ((data != null) && (!data.equals(""))) {
+                    Log.v(DetailsActivity.class.getName(), "REVIEWS: " + data);
+                    Review[] reviews;
+                    try {
+                        reviews = getReviewsFromJSONString(data);
+                    } catch (JSONException|ParseException e) {
+                        reviews = new Review[0];
+                        e.printStackTrace();
+                    }
+                    // TODO: adapter create / update!
+                    reviewsRecyclerView
+                            .setAdapter(new ReviewsAdapter(reviews));
+                }
                 break;
             default:
                 throw new RuntimeException("Invalid loader id: " + id);

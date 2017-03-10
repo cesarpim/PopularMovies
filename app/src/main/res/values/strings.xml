@@ -14,6 +14,8 @@
         "http://www.youtube.com/watch?v=%s"</string>
 
     <string name="loading_movies_error_message">Failed to load movies.</string>
+    <string name="trailers_title">Trailers</string>
+    <string name="reviews_title">Reviews</string>
 
     <string name="scanner_delimiter" translatable="false">\\A</string>
 
@@ -29,6 +31,10 @@
     <string name="themoviedb_json_trailer_results_tag" translatable="false">results</string>
     <string name="themoviedb_json_trailer_title_tag" translatable="false">name</string>
     <string name="themoviedb_json_trailer_youtube_key_tag" translatable="false">key</string>
+
+    <string name="themoviedb_json_review_results_tag" translatable="false">results</string>
+    <string name="themoviedb_json_review_author_tag" translatable="false">author</string>
+    <string name="themoviedb_json_review_content_key_tag" translatable="false">content</string>
 
     <string name="themoviedb_image_base_url" translatable="false">
         http://image.tmdb.org/t/p/</string>

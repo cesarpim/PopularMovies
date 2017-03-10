@@ -2,6 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="@drawable/list_item_selector"
     android:id="@+id/text_trailer_title"
+    android:textColor="@color/colorAccent"
     android:textSize="@dimen/medium_text_size"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
