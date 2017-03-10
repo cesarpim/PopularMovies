@@ -137,42 +137,27 @@ public class DetailsActivity
         ratingTextView = (TextView) findViewById(R.id.text_rating);
         synopsisTextView = (TextView) findViewById(R.id.text_synopsis);
         favoriteToggleButton = (ToggleButton) findViewById(R.id.toggle_favorite);
-        trailersRecyclerView = (RecyclerView) findViewById(R.id.recycler_trailers);
-        trailersRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        trailersRecyclerView.setHasFixedSize(true);
-        reviewsRecyclerView = (RecyclerView) findViewById(R.id.recycler_reviews);
-        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        reviewsRecyclerView.setHasFixedSize(true);
+        trailersRecyclerView = initRecyclerView(R.id.recycler_trailers);
+        reviewsRecyclerView = initRecyclerView(R.id.recycler_reviews);
 
         Intent launchIntent = getIntent();
         if (launchIntent.hasExtra(getString(R.string.intent_extra_movie_key))) {
             movie = (Movie) launchIntent.getSerializableExtra(getString(R.string.intent_extra_movie_key));
         }
         if (movie != null) {
-            setupViews();
-        }
-        movieUri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
-                .appendPath(Integer.toString(movie.getId()))
-                .build();
-        getSupportLoaderManager()
-                .initLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
-                .forceLoad();
-//        trailers = new Trailer[0]; // INICIALIZAR ADAPTER DEPOIS DISTO
-
-        LoaderManager manager = getSupportLoaderManager();
-        runLoaderFromStart(manager, TRAILERS_LOADER_ID);
-        runLoaderFromStart(manager, REVIEWS_LOADER_ID);
-    }
-
-    private void runLoaderFromStart(LoaderManager manager, int loaderID) {
-        if (manager.getLoader(loaderID) == null) {
-            manager.initLoader(loaderID, null, this);
-        } else {
-            manager.restartLoader(loaderID, null, this);
+            loadViews();
         }
     }
 
-    private void setupViews () {
+    private RecyclerView initRecyclerView(int viewResId) {
+        RecyclerView recyclerView = (RecyclerView) findViewById(viewResId);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setNestedScrollingEnabled(false);
+        return recyclerView;
+    }
+
+    private void loadViews() {
         String posterStringURL =
                 getString(R.string.themoviedb_image_base_url)
                         + getString(R.string.themoviedb_image_size)
@@ -185,6 +170,23 @@ public class DetailsActivity
         String ratingString = String.valueOf(movie.getRating()) + getString(R.string.details_rating_cap);
         ratingTextView.setText(ratingString);
         synopsisTextView.setText(movie.getSynopsis());
+        movieUri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
+                .appendPath(Integer.toString(movie.getId()))
+                .build();
+        getSupportLoaderManager()
+                .initLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
+                .forceLoad();
+        LoaderManager manager = getSupportLoaderManager();
+        runLoaderFromStart(manager, TRAILERS_LOADER_ID);
+        runLoaderFromStart(manager, REVIEWS_LOADER_ID);
+    }
+
+    private void runLoaderFromStart(LoaderManager manager, int loaderID) {
+        if (manager.getLoader(loaderID) == null) {
+            manager.initLoader(loaderID, null, this);
+        } else {
+            manager.restartLoader(loaderID, null, this);
+        }
     }
 
     @Override
