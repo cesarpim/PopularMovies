@@ -8,6 +8,8 @@
     <dimen name="progress_bar_size">42dp</dimen>
 
     <dimen name="details_element_distance">16dp</dimen>
+    <dimen name="text_with_drawing_distance">6dp</dimen>
+    <dimen name="list_item_vertical_padding">6dp</dimen>
     <dimen name="star_button_width">30dp</dimen>
     <dimen name="star_button_height">30dp</dimen>
 

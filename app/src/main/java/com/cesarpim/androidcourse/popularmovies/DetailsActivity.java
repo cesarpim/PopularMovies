@@ -45,7 +45,6 @@ public class DetailsActivity
     private TextView synopsisTextView;
     private ToggleButton favoriteToggleButton;
     private RecyclerView trailersRecyclerView;
-    private TrailersAdapter trailersAdapter;
     private Movie movie = null;
     private Uri movieUri;
     private Trailer[] trailers;
@@ -116,7 +115,13 @@ public class DetailsActivity
 
     @Override
     public void onTrailerClick(String clickedTrailerYoutubeKey) {
-        Log.d(DetailsActivity.class.getName(), "TRAILER KEY: " + clickedTrailerYoutubeKey);
+        String trailerAddress = String.format(
+                getString(R.string.youtube_video_template_address),
+                clickedTrailerYoutubeKey);
+        Log.d(DetailsActivity.class.getName(), "TRAILER ADDRESS: " + trailerAddress);
+        Uri trailerUri = Uri.parse(trailerAddress);
+        Intent launchTrailerIntent = new Intent(Intent.ACTION_VIEW, trailerUri);
+        startActivity(launchTrailerIntent);
     }
 
     @Override
@@ -147,7 +152,7 @@ public class DetailsActivity
         getSupportLoaderManager()
                 .initLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
                 .forceLoad();
-        trailers = new Trailer[0]; // TODO: INICIALIZAR ADAPTER DEPOIS DISTO
+//        trailers = new Trailer[0]; // INICIALIZAR ADAPTER DEPOIS DISTO
 
         LoaderManager manager = getSupportLoaderManager();
         if (manager.getLoader(TRAILERS_LOADER_ID) == null) {

@@ -10,6 +10,9 @@
     <string name="themoviedb_trailers_path" translatable="false">videos</string>
     <string name="themoviedb_reviews_path" translatable="false">reviews</string>
 
+    <string name="youtube_video_template_address" formatted="false" translatable="false">
+        "http://www.youtube.com/watch?v=%s"</string>
+
     <string name="loading_movies_error_message">Failed to load movies.</string>
 
     <string name="scanner_delimiter" translatable="false">\\A</string>

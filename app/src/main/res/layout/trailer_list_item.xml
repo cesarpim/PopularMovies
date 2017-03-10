@@ -1,29 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/list_item_selector"
     android:id="@+id/text_trailer_title"
-    android:layout_width="wrap_content"
+    android:textSize="@dimen/medium_text_size"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:drawablePadding="@dimen/details_element_distance"
+    android:paddingTop="@dimen/list_item_vertical_padding"
+    android:paddingBottom="@dimen/list_item_vertical_padding"
     android:drawableLeft="@android:drawable/ic_media_play"
     android:drawableStart="@android:drawable/ic_media_play"
     />
 
-<!--
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:contentDescription="@string/play_trailer_content_description"
-        android:src="@android:drawable/ic_media_play"
-        />
-
-    <TextView
-        android:id="@+id/text_trailer_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
-
-</LinearLayout>-->
