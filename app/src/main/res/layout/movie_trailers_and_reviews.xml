@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <TextView
+        android:id="@+id/text_trailers_title"
+        android:text="@string/trailers_title"
+        android:textSize="@dimen/big_text_size"
+        android:textStyle="bold|italic"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/details_element_distance"
+        android:paddingBottom="@dimen/list_item_vertical_padding"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_trailers"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:id="@+id/text_reviews_title"
+        android:text="@string/reviews_title"
+        android:textSize="@dimen/big_text_size"
+        android:textStyle="bold|italic"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/details_element_distance"
+        android:paddingBottom="@dimen/list_item_vertical_padding"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_reviews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+</LinearLayout>
