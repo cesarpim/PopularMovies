@@ -7,7 +7,6 @@
 
     <TextView
         android:id="@+id/text_trailers_title"
-        android:text="@string/trailers_title"
         android:textSize="@dimen/big_text_size"
         android:textStyle="bold|italic"
         android:gravity="center"
@@ -25,7 +24,6 @@
 
     <TextView
         android:id="@+id/text_reviews_title"
-        android:text="@string/reviews_title"
         android:textSize="@dimen/big_text_size"
         android:textStyle="bold|italic"
         android:gravity="center"

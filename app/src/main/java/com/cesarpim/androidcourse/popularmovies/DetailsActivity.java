@@ -44,6 +44,8 @@ public class DetailsActivity
     private TextView ratingTextView;
     private TextView synopsisTextView;
     private ToggleButton favoriteToggleButton;
+    private TextView trailersTitleText;
+    private TextView reviewsTitleText;
     private RecyclerView trailersRecyclerView;
     private RecyclerView reviewsRecyclerView;
     private Movie movie = null;
@@ -137,6 +139,8 @@ public class DetailsActivity
         ratingTextView = (TextView) findViewById(R.id.text_rating);
         synopsisTextView = (TextView) findViewById(R.id.text_synopsis);
         favoriteToggleButton = (ToggleButton) findViewById(R.id.toggle_favorite);
+        trailersTitleText = (TextView) findViewById(R.id.text_trailers_title);
+        reviewsTitleText = (TextView) findViewById(R.id.text_reviews_title);
         trailersRecyclerView = initRecyclerView(R.id.recycler_trailers);
         reviewsRecyclerView = initRecyclerView(R.id.recycler_reviews);
 
@@ -318,7 +322,9 @@ public class DetailsActivity
                         trailers = new Trailer[0];
                         e.printStackTrace();
                     }
-                    // TODO: adapter create / update!
+                    trailersTitleText.setText(getString(trailers.length == 0 ?
+                            R.string.no_trailers_title :
+                            R.string.trailers_title));
                     trailersRecyclerView
                             .setAdapter(new TrailersAdapter(trailers, DetailsActivity.this));
                 }
@@ -333,7 +339,9 @@ public class DetailsActivity
                         reviews = new Review[0];
                         e.printStackTrace();
                     }
-                    // TODO: adapter create / update!
+                    reviewsTitleText.setText(getString(reviews.length == 0 ?
+                            R.string.no_reviews_title :
+                            R.string.reviews_title));
                     reviewsRecyclerView
                             .setAdapter(new ReviewsAdapter(reviews));
                 }

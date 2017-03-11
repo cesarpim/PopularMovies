@@ -15,7 +15,9 @@
 
     <string name="loading_movies_error_message">Failed to load movies.</string>
     <string name="trailers_title">Trailers</string>
+    <string name="no_trailers_title">No Trailers Found</string>
     <string name="reviews_title">Reviews</string>
+    <string name="no_reviews_title">No Reviews Found</string>
 
     <string name="scanner_delimiter" translatable="false">\\A</string>
 
