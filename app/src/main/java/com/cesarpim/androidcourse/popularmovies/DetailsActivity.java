@@ -50,8 +50,6 @@ public class DetailsActivity
     private RecyclerView reviewsRecyclerView;
     private Movie movie = null;
     private Uri movieUri;
-//    private Trailer[] trailers;
-//    private Review[] reviews;
 
     /**
      * Loader that returns a boolean indicating whether the movie is or isn't in the favorites.
@@ -61,7 +59,6 @@ public class DetailsActivity
                 @Override
                 public Loader<Boolean> onCreateLoader(int id, Bundle args) {
                     return new AsyncTaskLoader<Boolean>(DetailsActivity.this) {
-
                         @Override
                         public Boolean loadInBackground() {
                             Boolean isFavorite = false;
@@ -97,7 +94,6 @@ public class DetailsActivity
                 @Override
                 public Loader<Void> onCreateLoader(int id, Bundle args) {
                     return new AsyncTaskLoader<Void>(DetailsActivity.this) {
-
                         @Override
                         public Void loadInBackground() {
                             if (favoriteToggleButton.isChecked()) {
@@ -178,19 +174,11 @@ public class DetailsActivity
                 .appendPath(Integer.toString(movie.getId()))
                 .build();
         getSupportLoaderManager()
-                .initLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
+                .restartLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
                 .forceLoad();
         LoaderManager manager = getSupportLoaderManager();
-        runLoaderFromStart(manager, TRAILERS_LOADER_ID);
-        runLoaderFromStart(manager, REVIEWS_LOADER_ID);
-    }
-
-    private void runLoaderFromStart(LoaderManager manager, int loaderID) {
-        if (manager.getLoader(loaderID) == null) {
-            manager.initLoader(loaderID, null, this);
-        } else {
-            manager.restartLoader(loaderID, null, this);
-        }
+        manager.restartLoader(TRAILERS_LOADER_ID, null, this);
+        manager.restartLoader(REVIEWS_LOADER_ID, null, this);
     }
 
     @Override
@@ -206,7 +194,7 @@ public class DetailsActivity
 
     public void onClickToggleFavorite(View view) {
         getSupportLoaderManager()
-                .initLoader(FAVORITE_TOGGLE_LOADER_ID, null, favoriteToggleLoaderListener)
+                .restartLoader(FAVORITE_TOGGLE_LOADER_ID, null, favoriteToggleLoaderListener)
                 .forceLoad();
     }
 

@@ -73,7 +73,10 @@ public class MainActivity
         } else {
             sortBy = SortBy.values()[savedInstanceState.getInt(SORT_BY_KEY)];
         }
-        updateMoviesFromSource();
+        Log.d(MainActivity.class.getName(), "onCreate CALLED");
+        Log.d(MainActivity.class.getName(), getSupportLoaderManager().getLoader(MOVIES_LOADER_ID) == null ? "DIDNT EXIST" : "EXISTED");
+//        getSupportLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
+        getSupportLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
     }
 
     private int calculatePosterGridSpan() {
@@ -126,7 +129,7 @@ public class MainActivity
                 return super.onOptionsItemSelected(item);
         }
         item.setChecked(false);
-        updateMoviesFromSource();
+        getSupportLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
         moviesRecyclerView.scrollToPosition(0);
         return true;
     }
@@ -139,15 +142,6 @@ public class MainActivity
     private void makeErrorVisible() {
         moviesRecyclerView.setVisibility(View.INVISIBLE);
         errorTextView.setVisibility(View.VISIBLE);
-    }
-
-    private void updateMoviesFromSource() {
-        LoaderManager manager = getSupportLoaderManager();
-        if (manager.getLoader(MOVIES_LOADER_ID) == null) {
-            manager.initLoader(MOVIES_LOADER_ID, null, this);
-        } else {
-            manager.restartLoader(MOVIES_LOADER_ID, null, this);
-        }
     }
 
     private Movie[] getMoviesFromJSONString(String s) throws JSONException, ParseException {
@@ -216,7 +210,7 @@ public class MainActivity
     }
 
     private Movie[] loadMoviesFromProvider() {
-        Movie [] loadedMovies = null;
+        Movie[] loadedMovies = null;
         Cursor queryResults;
         try {
             queryResults = getContentResolver().query(
