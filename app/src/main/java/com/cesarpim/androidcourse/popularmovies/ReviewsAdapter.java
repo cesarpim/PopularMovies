@@ -8,6 +8,10 @@ import android.widget.TextView;
 
 /**
  * Created by CesarPim on 10-03-2017.
+ *
+ * Adapter for the RecyclerView of movie reviews.
+ *
+ * @author CesarPim
  */
 
 class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ReviewViewHolder> {

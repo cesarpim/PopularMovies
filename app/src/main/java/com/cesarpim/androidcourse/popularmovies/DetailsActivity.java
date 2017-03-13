@@ -11,7 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -118,7 +117,6 @@ public class DetailsActivity
         String trailerAddress = String.format(
                 getString(R.string.youtube_video_template_address),
                 clickedTrailerYoutubeKey);
-        Log.d(DetailsActivity.class.getName(), "TRAILER ADDRESS: " + trailerAddress);
         Uri trailerUri = Uri.parse(trailerAddress);
         Intent launchTrailerIntent = new Intent(Intent.ACTION_VIEW, trailerUri);
         startActivity(launchTrailerIntent);
@@ -217,16 +215,14 @@ public class DetailsActivity
             contentValues.put(
                     FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE,
                     movie.getReleaseDate().getTime());
-            Uri uri = getContentResolver()
+            getContentResolver()
                     .insert(FavoriteMoviesContract.MovieEntry.CONTENT_URI, contentValues);
-            Log.d(DetailsActivity.class.getName(), "INSERT URI: " + uri);
         }
     }
 
     private void deleteFavorite() {
         if (movie != null) {
-            int numDeletedMovies = getContentResolver().delete(movieUri, null, null);
-            Log.d(DetailsActivity.class.getName(), "MOVIES DELETED: " + numDeletedMovies);
+            getContentResolver().delete(movieUri, null, null);
         }
     }
 
@@ -302,10 +298,6 @@ public class DetailsActivity
                     Trailer[] trailers;
                     try {
                         trailers = getTrailersFromJSONString(data);
-                        // TODO: JUST FOR DEBUG:
-                        for (Trailer trailer : trailers) {
-                            Log.v(DetailsActivity.class.getName(), trailer.toString());
-                        }
                     } catch (JSONException|ParseException e) {
                         trailers = new Trailer[0];
                         e.printStackTrace();
@@ -319,7 +311,6 @@ public class DetailsActivity
                 break;
             case REVIEWS_LOADER_ID:
                 if ((data != null) && (!data.equals(""))) {
-                    Log.v(DetailsActivity.class.getName(), "REVIEWS: " + data);
                     Review[] reviews;
                     try {
                         reviews = getReviewsFromJSONString(data);
@@ -341,7 +332,6 @@ public class DetailsActivity
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
-        // TODO: FAZER QQ COISA COM OS ADAPTERS?
     }
 
 }

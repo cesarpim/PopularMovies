@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -73,8 +72,6 @@ public class MainActivity
         } else {
             sortBy = SortBy.values()[savedInstanceState.getInt(SORT_BY_KEY)];
         }
-        Log.d(MainActivity.class.getName(), "onCreate CALLED");
-        Log.d(MainActivity.class.getName(), getSupportLoaderManager().getLoader(MOVIES_LOADER_ID) == null ? "DIDNT EXIST" : "EXISTED");
 //        getSupportLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
         getSupportLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
     }
@@ -169,7 +166,6 @@ public class MainActivity
     private Movie[] getMoviesFromCursor (Cursor cursor) {
         int numMovies = cursor.getCount();
         Movie[] moviesRead = new Movie[numMovies];
-        Log.d(MainActivity.class.getName(), "numMovies = " + numMovies);
         cursor.moveToFirst();
         for (int i = 0; i < numMovies; i++) {
             moviesRead[i] = new Movie(
@@ -185,7 +181,6 @@ public class MainActivity
                             FavoriteMoviesContract.MovieEntry.COLUMN_RATING)),
                     new Date(cursor.getLong(cursor.getColumnIndex(
                             FavoriteMoviesContract.MovieEntry.COLUMN_RELEASE_DATE))));
-            Log.v(MainActivity.class.getName(), "movie " + i + " READ = " + moviesRead[i]);
             cursor.moveToNext();
         }
         return moviesRead;
@@ -235,14 +230,12 @@ public class MainActivity
 
             @Override
             protected void onStartLoading() {
-                Log.d(MainActivity.class.getName(), "onStartLoading CALLED");
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 forceLoad();
             }
 
             @Override
             public Movie[] loadInBackground() {
-                Log.d(MainActivity.class.getName(), "loadInBackground CALLED");
                 SortBy currentSortBy = sortBy;
                 Movie[] newMovies;
                 if (currentSortBy == SortBy.FAVORITES) {
@@ -257,7 +250,6 @@ public class MainActivity
 
     @Override
     public void onLoadFinished(Loader<Movie[]> loader, Movie[] data) {
-        Log.d(MainActivity.class.getName(), "onLoadFinished CALLED");
         loadingProgressBar.setVisibility(View.INVISIBLE);
         if (data != null) {
             movies = data;
@@ -270,8 +262,6 @@ public class MainActivity
 
     @Override
     public void onLoaderReset(Loader<Movie[]> loader) {
-        // TODO: ???
-        Log.d(MainActivity.class.getName(), "onLoaderReset CALLED");
     }
 
 }

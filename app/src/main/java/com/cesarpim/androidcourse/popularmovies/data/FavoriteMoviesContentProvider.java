@@ -3,6 +3,7 @@ package com.cesarpim.androidcourse.popularmovies.data;
 import android.content.ContentProvider;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -68,8 +69,10 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Invalid URI: " + uri);
         }
-        // TODO: treat exception?
-        getContext().getContentResolver().notifyChange(uri, null);
+        Context context = getContext();
+        if (context != null) {
+            context.getContentResolver().notifyChange(uri, null);
+        }
         return resultUri;
     }
 
@@ -109,7 +112,10 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Invalid URI: " + uri);
         }
-        resultCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        Context context = getContext();
+        if (context != null) {
+            resultCursor.setNotificationUri(context.getContentResolver(), uri);
+        }
         return resultCursor;
     }
 
@@ -139,7 +145,10 @@ public class FavoriteMoviesContentProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Invalid URI: " + uri);
         }
         if (numDeletedMovies > 0) {
-            getContext().getContentResolver().notifyChange(uri, null);
+            Context context = getContext();
+            if (context != null) {
+                context.getContentResolver().notifyChange(uri, null);
+            }
         }
         return numDeletedMovies;
     }
