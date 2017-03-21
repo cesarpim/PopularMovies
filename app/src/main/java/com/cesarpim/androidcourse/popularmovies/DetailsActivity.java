@@ -59,6 +59,11 @@ public class DetailsActivity
                 public Loader<Boolean> onCreateLoader(int id, Bundle args) {
                     return new AsyncTaskLoader<Boolean>(DetailsActivity.this) {
                         @Override
+                        protected void onStartLoading() {
+                            super.onStartLoading();
+                            forceLoad();
+                        }
+                        @Override
                         public Boolean loadInBackground() {
                             Boolean isFavorite = false;
                             Cursor queryResult = null;
@@ -93,6 +98,11 @@ public class DetailsActivity
                 @Override
                 public Loader<Void> onCreateLoader(int id, Bundle args) {
                     return new AsyncTaskLoader<Void>(DetailsActivity.this) {
+                        @Override
+                        protected void onStartLoading() {
+                            super.onStartLoading();
+                            forceLoad();
+                        }
                         @Override
                         public Void loadInBackground() {
                             if (favoriteToggleButton.isChecked()) {
@@ -171,12 +181,10 @@ public class DetailsActivity
         movieUri = FavoriteMoviesContract.MovieEntry.CONTENT_URI.buildUpon()
                 .appendPath(Integer.toString(movie.getId()))
                 .build();
-        getSupportLoaderManager()
-                .restartLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener)
-                .forceLoad();
         LoaderManager manager = getSupportLoaderManager();
-        manager.restartLoader(TRAILERS_LOADER_ID, null, this);
-        manager.restartLoader(REVIEWS_LOADER_ID, null, this);
+        manager.initLoader(FAVORITE_CHECK_LOADER_ID, null, favoriteCheckLoaderListener);
+        manager.initLoader(TRAILERS_LOADER_ID, null, this);
+        manager.initLoader(REVIEWS_LOADER_ID, null, this);
     }
 
     @Override
@@ -192,8 +200,7 @@ public class DetailsActivity
 
     public void onClickToggleFavorite(View view) {
         getSupportLoaderManager()
-                .restartLoader(FAVORITE_TOGGLE_LOADER_ID, null, favoriteToggleLoaderListener)
-                .forceLoad();
+                .restartLoader(FAVORITE_TOGGLE_LOADER_ID, null, favoriteToggleLoaderListener);
     }
 
     private void addFavorite() {
@@ -332,6 +339,17 @@ public class DetailsActivity
 
     @Override
     public void onLoaderReset(Loader<String> loader) {
+        int id = loader.getId();
+        switch (id) {
+            case TRAILERS_LOADER_ID:
+                ((TrailersAdapter) trailersRecyclerView.getAdapter()).updateTrailers(null);
+                break;
+            case REVIEWS_LOADER_ID:
+                ((ReviewsAdapter) reviewsRecyclerView.getAdapter()).updateReviews(null);
+                break;
+            default:
+                throw new RuntimeException("Invalid loader id: " + id);
+        }
     }
 
 }

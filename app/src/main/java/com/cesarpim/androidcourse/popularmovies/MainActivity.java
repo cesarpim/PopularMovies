@@ -2,7 +2,6 @@ package com.cesarpim.androidcourse.popularmovies;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -34,7 +33,7 @@ public class MainActivity
 
     private static final int MOVIES_LOADER_ID = 1001;
     private static final String SORT_BY_KEY = "sort by";
-    private static final String MOVIES_LAYOUT_MANAGER_STATE_KEY = "movies layout manager state";
+//    private static final String MOVIES_LAYOUT_MANAGER_STATE_KEY = "movies layout manager state";
 
     private enum SortBy {MOST_POPULAR, HIGHEST_RATED, FAVORITES}
 
@@ -44,7 +43,7 @@ public class MainActivity
     private ProgressBar loadingProgressBar;
     private PostersAdapter postersAdapter;
     private SortBy sortBy;
-    private Parcelable moviesLayoutManagerState;
+//    private Parcelable moviesLayoutManagerState;
     private Boolean scrollUp;
 
     @Override
@@ -74,19 +73,20 @@ public class MainActivity
         scrollUp = false;
         if (savedInstanceState == null) {
             sortBy = SortBy.MOST_POPULAR;
-            moviesLayoutManagerState = null;
+//            moviesLayoutManagerState = null;
         } else {
             sortBy = SortBy.values()[savedInstanceState.getInt(SORT_BY_KEY)];
-            moviesLayoutManagerState
-                    = savedInstanceState.getParcelable(MOVIES_LAYOUT_MANAGER_STATE_KEY);
+//            moviesLayoutManagerState
+//                    = savedInstanceState.getParcelable(MOVIES_LAYOUT_MANAGER_STATE_KEY);
         }
+        getSupportLoaderManager().initLoader(MOVIES_LOADER_ID, null, this);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        getSupportLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        getSupportLoaderManager().restartLoader(MOVIES_LOADER_ID, null, this);
+//    }
 
     private int calculatePosterGridSpan() {
         DisplayMetrics metrics = new DisplayMetrics();
@@ -101,9 +101,9 @@ public class MainActivity
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SORT_BY_KEY, sortBy.ordinal());
-        outState.putParcelable(
-                MOVIES_LAYOUT_MANAGER_STATE_KEY,
-                moviesRecyclerView.getLayoutManager().onSaveInstanceState());
+//        outState.putParcelable(
+//                MOVIES_LAYOUT_MANAGER_STATE_KEY,
+//                moviesRecyclerView.getLayoutManager().onSaveInstanceState());
     }
 
     @Override
@@ -245,6 +245,7 @@ public class MainActivity
 
             @Override
             protected void onStartLoading() {
+                super.onStartLoading();
                 loadingProgressBar.setVisibility(View.VISIBLE);
                 forceLoad();
             }
@@ -273,12 +274,12 @@ public class MainActivity
             if (scrollUp) {
                 moviesRecyclerView.scrollToPosition(0);
                 scrollUp = false;
-            } else if (moviesLayoutManagerState != null) {
-                moviesRecyclerView.getLayoutManager()
-                        .onRestoreInstanceState(moviesLayoutManagerState);
-                // Setting the saved state to null to prevent restoring to that state again when
-                // the activity is NOT being recreated
-                moviesLayoutManagerState = null;
+//            } else if (moviesLayoutManagerState != null) {
+//                moviesRecyclerView.getLayoutManager()
+//                        .onRestoreInstanceState(moviesLayoutManagerState);
+//                // Setting the saved state to null to prevent restoring to that state again when
+//                // the activity is NOT being recreated
+//                moviesLayoutManagerState = null;
             }
         } else {
             makeErrorVisible();
@@ -287,6 +288,7 @@ public class MainActivity
 
     @Override
     public void onLoaderReset(Loader<Movie[]> loader) {
+        postersAdapter.updateMovies(null);
     }
 
 }
