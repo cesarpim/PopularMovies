@@ -288,7 +288,9 @@ public class MainActivity
 
     @Override
     public void onLoaderReset(Loader<Movie[]> loader) {
-        postersAdapter.updateMovies(null);
+        if (postersAdapter != null) {
+            postersAdapter.updateMovies(null);
+        }
     }
 
 }

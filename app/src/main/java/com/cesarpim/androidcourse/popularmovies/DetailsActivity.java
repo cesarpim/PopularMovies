@@ -47,6 +47,8 @@ public class DetailsActivity
     private TextView reviewsTitleText;
     private RecyclerView trailersRecyclerView;
     private RecyclerView reviewsRecyclerView;
+    private TrailersAdapter trailersAdapter = null;
+    private ReviewsAdapter reviewsAdapter = null;
     private Movie movie = null;
     private Uri movieUri;
 
@@ -147,6 +149,10 @@ public class DetailsActivity
         reviewsTitleText = (TextView) findViewById(R.id.text_reviews_title);
         trailersRecyclerView = initRecyclerView(R.id.recycler_trailers);
         reviewsRecyclerView = initRecyclerView(R.id.recycler_reviews);
+        trailersAdapter = new TrailersAdapter(new Trailer[0], DetailsActivity.this);
+        trailersRecyclerView.setAdapter(trailersAdapter);
+        reviewsAdapter = new ReviewsAdapter(new Review[0]);
+        reviewsRecyclerView.setAdapter(reviewsAdapter);
 
         Intent launchIntent = getIntent();
         if (launchIntent.hasExtra(getString(R.string.intent_extra_movie_key))) {
@@ -312,8 +318,7 @@ public class DetailsActivity
                     trailersTitleText.setText(getString(trailers.length == 0 ?
                             R.string.no_trailers_title :
                             R.string.trailers_title));
-                    trailersRecyclerView
-                            .setAdapter(new TrailersAdapter(trailers, DetailsActivity.this));
+                    trailersAdapter.updateTrailers(trailers);
                 }
                 break;
             case REVIEWS_LOADER_ID:
@@ -328,8 +333,7 @@ public class DetailsActivity
                     reviewsTitleText.setText(getString(reviews.length == 0 ?
                             R.string.no_reviews_title :
                             R.string.reviews_title));
-                    reviewsRecyclerView
-                            .setAdapter(new ReviewsAdapter(reviews));
+                    reviewsAdapter.updateReviews(reviews);
                 }
                 break;
             default:
@@ -342,10 +346,14 @@ public class DetailsActivity
         int id = loader.getId();
         switch (id) {
             case TRAILERS_LOADER_ID:
-                ((TrailersAdapter) trailersRecyclerView.getAdapter()).updateTrailers(null);
+                if (trailersAdapter != null) {
+                    trailersAdapter.updateTrailers(null);
+                }
                 break;
             case REVIEWS_LOADER_ID:
-                ((ReviewsAdapter) reviewsRecyclerView.getAdapter()).updateReviews(null);
+                if (reviewsAdapter != null) {
+                    reviewsAdapter.updateReviews(null);
+                }
                 break;
             default:
                 throw new RuntimeException("Invalid loader id: " + id);
